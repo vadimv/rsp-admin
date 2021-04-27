@@ -54,7 +54,7 @@ public class Form implements Component<rsp.admin.crud.components.Form.State> {
                             }
                         }),
                         of(Arrays.stream(fieldsComponents).map(component ->
-                                div(component.render(UseState.readOnly(() -> Optional.ofNullable(useState.get().validationErrors.get(component.fieldName))))))),
+                                div(component.render(Optional.ofNullable(useState.get().validationErrors.get(component.fieldName)))))),
                         button(attr("type", "submit"), text("Ok")),
                         button(attr("type", "button"),
                                 on("click", ctx -> useState.accept(new State(Collections.EMPTY_MAP))),

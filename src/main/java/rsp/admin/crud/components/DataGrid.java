@@ -30,7 +30,7 @@ public class DataGrid<T> implements Component<rsp.admin.crud.components.DataGrid
                                                  attr("autocomplete", "off"),
                                                  on("click", ctx -> state.accept(state.get().toggleRowSelection(row))))),
                                         of(Arrays.stream(columns).map(column -> td(column.fieldComponent.apply(row.data)
-                                                .render(UseState.readWrite(() -> row.key, k -> state.accept(state.get().withEditRowKey(Optional.of(row.key))))))))
+                                                .render(row.key, k -> state.accept(state.get().withEditRowKey(Optional.of(row.key)))))))
                                 )))))
                 );
     }

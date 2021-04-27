@@ -23,7 +23,7 @@ public class Edit<T> implements Component<DetailsViewState<T>> {
         return div(span("Edit"),
                    of(us.get().currentValue.map(currentValue -> formFunction.apply(UseState.readWrite(() -> currentValue,
                                                 v -> us.accept(us.get().withValue(v).withValidationErrors(Collections.EMPTY_MAP))))
-                                                       .render(UseState.readWrite(() -> new Form.State(us.get().validationErrors),
-                                                                                   v -> us.accept(us.get().withValidationErrors(v.validationErrors))))).stream()));
+                                                       .render(new Form.State(us.get().validationErrors),
+                                                               v -> us.accept(us.get().withValidationErrors(v.validationErrors)))).stream()));
     }
 }

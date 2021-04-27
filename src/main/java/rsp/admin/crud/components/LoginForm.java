@@ -32,8 +32,8 @@ public class LoginForm implements Component<rsp.admin.crud.components.LoginForm.
                                                     Optional.empty(),
                                                     Optional.of(c.sessionId().deviceId)));
                                 }),
-                new TextInput("username", TextInput.Type.TEXT, "Username","").render(UseState.readOnly(() -> us.get().userNameValidationError)),
-                new TextInput("password", TextInput.Type.PASSWORD, "Password", "").render(UseState.readOnly(() -> us.get().passwordVaildationError)),
+                new TextInput("username", TextInput.Type.TEXT, "Username","").render(us.get().userNameValidationError),
+                new TextInput("password", TextInput.Type.PASSWORD, "Password", "").render(us.get().passwordVaildationError),
                 button(attr("type", "submit"), text("Login")),
                 of(us.get().loginValidationError.stream().map(lve -> span(lve)))));
     }

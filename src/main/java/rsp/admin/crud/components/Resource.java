@@ -111,7 +111,7 @@ public class Resource<T> implements Component<rsp.admin.crud.components.Resource
                         () -> of(editComponent.map(ec -> ec.render(detailsViewState(us))).stream())));
     }
 
-    private UseState<DetailsViewState<T>> detailsViewState(UseState<rsp.admin.crud.components.Resource.State<T>> us) {
+    private UseState<DetailsViewState<T>> detailsViewState(UseState<State<T>> us) {
         return readWrite(() -> us.get().details.get(),
                          editState -> {
             if (!editState.validationErrors.isEmpty()) {

@@ -2,8 +2,6 @@ package rsp.admin.crud.components;
 
 import rsp.Component;
 import rsp.dsl.DocumentPartDefinition;
-import rsp.admin.crud.components.DetailsViewState;
-import rsp.admin.crud.components.Form;
 import rsp.state.UseState;
 
 import java.util.Collections;
@@ -26,7 +24,7 @@ public class Create<T> implements Component<DetailsViewState<T>> {
         return div(span("Create"),
                    formFunction.apply(readWrite(() -> us.get().currentValue.get(),
                                             v -> us.accept(us.get().withValue(v).withValidationErrors(Collections.EMPTY_MAP))))
-                                                   .render(readWrite(() -> new Form.State(us.get().validationErrors),
-                                                                     v -> us.accept(us.get().withValidationErrors(v.validationErrors)))));
+                                                   .render(new Form.State(us.get().validationErrors),
+                                                           v -> us.accept(us.get().withValidationErrors(v.validationErrors))));
     }
 }
