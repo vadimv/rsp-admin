@@ -83,7 +83,7 @@ public class Admin {
         return html(window().on("popstate",
                                 ctx ->
             ctx.eventObject().value("path").ifPresent(path -> dispatch(us.get().user, Path.of(path.toString()))
-                                                                         .thenAccept(us::accept)))
+                                                                         .thenAccept(us)))
         ,
                     head(title(title + us.get().currentResource.map(r -> ": " + r.title).orElse("")),
                          link(attr("rel", "stylesheet"), attr("href","/res/style.css"))),
