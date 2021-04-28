@@ -13,6 +13,7 @@ public class DataGrid<T> implements Component<rsp.admin.crud.components.DataGrid
 
     private final Column<T>[] columns;
 
+    @SafeVarargs
     public DataGrid(Column<T>... columns) {
         this.columns = columns;
     }

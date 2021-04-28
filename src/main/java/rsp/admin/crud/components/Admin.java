@@ -63,17 +63,11 @@ public class Admin {
         return new State(Optional.empty(), Optional.empty());
     }
 
-    private Path stateToPath(rsp.admin.crud.components.Admin.State s) {
+    private Path stateToPath(State s) {
         if (s.user.isPresent()) {
-            if (s.currentResource.isPresent()) {
-                if (s.currentResource.get().details.isPresent()) {
-                    return Path.of(s.currentResource.get().name + "/" + s.currentResource.get().details.get().currentKey.orElse("create"));
-                } else {
-                    return Path.of(s.currentResource.get().name);
-                }
-            } else {
-                return Path.EMPTY_ABSOLUTE;
-            }
+            return s.currentResource.map(state -> state.details.map(detailsViewState -> Path.of(state.name
+                                                    + "/" + detailsViewState.currentKey.orElse("create")))
+                                    .orElseGet(() -> Path.of(state.name))).orElse(Path.EMPTY_ABSOLUTE);
         } else {
             return Path.of("login");
         }
@@ -94,7 +88,7 @@ public class Admin {
                                                          }))),
                                                     new MenuPanel().render(new MenuPanel.State(Arrays.stream(resources).map(r -> new Tuple2<>(r.name, r.title)).collect(Collectors.toList()))),
 
-                                div(of(us.get().currentResource.flatMap(r -> findResourceComponent(r)).map(p -> p._2.render(readWrite(() -> p._1,
+                                div(of(us.get().currentResource.flatMap(this::findResourceComponent).map(p -> p._2.render(readWrite(() -> p._1,
                                                                                                                             v -> us.accept(us.get().withResource(Optional.of(v)))))).stream()))))
 
                                 .orElse(div(new LoginForm().render(new LoginForm.State(),

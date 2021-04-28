@@ -16,7 +16,7 @@ public class AdminSample {
 
     public static final int DEFAULT_PORT = 8080;
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         final SimpleDb db = new SimpleDb();
         final EntityService<String, Author> authorsService = db.authorsService();
         final EntityService<String, Book> booksService = db.booksService();
