@@ -2,12 +2,9 @@ package rsp.admin.crud.components;
 
 import rsp.App;
 import rsp.AppConfig;
-import rsp.dsl.DocumentPartDefinition;
-import rsp.admin.crud.components.LoginForm;
-import rsp.admin.crud.components.MenuPanel;
-import rsp.admin.crud.components.Resource;
 import rsp.admin.crud.entities.Principal;
 import rsp.admin.crud.services.Auth;
+import rsp.dsl.DocumentPartDefinition;
 import rsp.page.PageLifeCycle;
 import rsp.server.Path;
 import rsp.state.UseState;
@@ -86,7 +83,7 @@ public class Admin {
         return html(window().on("popstate",
                                 ctx ->
             ctx.eventObject().value("path").ifPresent(path -> dispatch(us.get().user, Path.of(path.toString()))
-                                                                         .thenAccept(s -> us.accept(s))))
+                                                                         .thenAccept(us::accept)))
         ,
                     head(title(title + us.get().currentResource.map(r -> ": " + r.title).orElse("")),
                          link(attr("rel", "stylesheet"), attr("href","/res/style.css"))),

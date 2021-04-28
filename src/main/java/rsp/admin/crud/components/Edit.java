@@ -2,8 +2,6 @@ package rsp.admin.crud.components;
 
 import rsp.Component;
 import rsp.dsl.DocumentPartDefinition;
-import rsp.admin.crud.components.DetailsViewState;
-import rsp.admin.crud.components.Form;
 import rsp.state.UseState;
 
 import java.util.Collections;

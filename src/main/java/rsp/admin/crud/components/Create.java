@@ -23,7 +23,7 @@ public class Create<T> implements Component<DetailsViewState<T>> {
     public DocumentPartDefinition render(UseState<DetailsViewState<T>> us) {
         return div(span("Create"),
                    formFunction.apply(readWrite(() -> us.get().currentValue.get(),
-                                            v -> us.accept(us.get().withValue(v).withValidationErrors(Collections.EMPTY_MAP))))
+                                            v -> us.accept(us.get().withValue(v).withValidationErrors(Collections.emptyMap()))))
                                                    .render(new Form.State(us.get().validationErrors),
                                                            v -> us.accept(us.get().withValidationErrors(v.validationErrors))));
     }

@@ -2,7 +2,6 @@ package rsp.admin.crud.components;
 
 import rsp.Component;
 import rsp.dsl.DocumentPartDefinition;
-import rsp.admin.crud.components.TextInput;
 import rsp.state.UseState;
 import rsp.util.data.Tuple2;
 import rsp.util.json.JsonDataType;
@@ -22,7 +21,6 @@ public class Form implements Component<rsp.admin.crud.components.Form.State> {
     private final Consumer<Function<String, Optional<String>>> submittedData;
     private final TextInput[] fieldsComponents;
 
-    @SafeVarargs
     public Form(Consumer<Function<String, Optional<String>>> submittedData, TextInput... fieldsComponents) {
         this.submittedData = submittedData;
         this.fieldsComponents = fieldsComponents;
@@ -57,7 +55,7 @@ public class Form implements Component<rsp.admin.crud.components.Form.State> {
                                 div(component.render(Optional.ofNullable(useState.get().validationErrors.get(component.fieldName)))))),
                         button(attr("type", "submit"), text("Ok")),
                         button(attr("type", "button"),
-                                on("click", ctx -> useState.accept(new State(Collections.EMPTY_MAP))),
+                                on("click", ctx -> useState.accept(new State(Collections.emptyMap()))),
                                 text("Cancel"))));
     }
 

@@ -15,9 +15,7 @@ public class EditButton implements Component<String> {
 
     @Override
     public DocumentPartDefinition render(UseState<String> useState) {
-        return a("#", "Edit", on("click", ctx -> {
-            useState.accept(useState.get());
-        }));
+        return a("#", "Edit", on("click", ctx -> useState.accept(useState.get())));
     }
 
 }

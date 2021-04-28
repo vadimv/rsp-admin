@@ -1,9 +1,8 @@
 package rsp.admin.crud.components;
 
 import rsp.Component;
-import rsp.dsl.DocumentPartDefinition;
-import rsp.admin.crud.components.Column;
 import rsp.admin.crud.entities.KeyedEntity;
+import rsp.dsl.DocumentPartDefinition;
 import rsp.state.UseState;
 
 import java.util.*;
