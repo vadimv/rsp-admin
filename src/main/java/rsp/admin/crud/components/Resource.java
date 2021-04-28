@@ -1,13 +1,9 @@
 package rsp.admin.crud.components;
 
 import rsp.Component;
-import rsp.dsl.DocumentPartDefinition;
-import rsp.admin.crud.components.Create;
-import rsp.admin.crud.components.DataGrid;
-import rsp.admin.crud.components.DetailsViewState;
-import rsp.admin.crud.components.Edit;
 import rsp.admin.crud.entities.KeyedEntity;
 import rsp.admin.crud.services.EntityService;
+import rsp.dsl.DocumentPartDefinition;
 import rsp.state.UseState;
 import rsp.util.StreamUtils;
 
@@ -91,18 +87,16 @@ public class Resource<T> implements Component<rsp.admin.crud.components.Resource
                                     final Set<KeyedEntity<String, T>> rows = us.get().list.selectedRows;
                                     StreamUtils.sequence(rows.stream().map(r -> entityService.delete(r.key))
                                                .collect(Collectors.toList()))
-                                               .thenAccept(l -> {
-                                                     entityService.getList(0, DEFAULT_PAGE_SIZE).thenAccept(entities -> {
-                                                            us.accept(us.get().withList(new DataGrid.Table<>(entities.toArray(new KeyedEntity[0]),
-                                                                                               new HashSet<>())));
-                                                     });
-                                                 });
+                                               .thenAccept(l -> entityService.getList(0, DEFAULT_PAGE_SIZE).thenAccept(entities -> {
+                                                      us.accept(us.get().withList(new DataGrid.Table<>(entities.toArray(new KeyedEntity[0]),
+                                                                                         new HashSet<>())));
+                                               }));
                                 }))),
-                    listComponent.render(readWrite(() -> us.get().list,
-                                                             gridState -> gridState.editRowKey.ifPresentOrElse(
-                                                                     editKey -> entityService.getOne(editKey).thenAccept(keo ->
-                                                                             us.accept(us.get().withEditData(keo.get()))).join(),
-                                                                                                         () -> us.accept(us.get().withList(gridState))))),
+                    listComponent.render(us.get().list,
+                                         gridState -> gridState.editRowKey.ifPresentOrElse(
+                                                 editKey -> entityService.getOne(editKey).thenAccept(keo ->
+                                                         us.accept(us.get().withEditData(keo.get()))).join(),
+                                                                                     () -> us.accept(us.get().withList(gridState)))),
 
                 when(us.get().details.isPresent() && !us.get().details.get().currentKey.isPresent(),
                         () -> of(createComponent.map(cc -> cc.render(detailsViewState(us))).stream())),
