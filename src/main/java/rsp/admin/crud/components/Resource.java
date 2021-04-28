@@ -66,7 +66,7 @@ public class Resource<T> implements Component<rsp.admin.crud.components.Resource
             return entityService.getList(0, DEFAULT_PAGE_SIZE)
                 .thenApply(entities -> new DataGrid.Table<String, T>(entities.toArray(new KeyedEntity[0]),
                                                                      new HashSet<>()))
-                .thenCombine(entityService.getOne(key).thenApply(keo -> new DetailsViewState(keo.map(ke -> ke.data),
+                .thenCombine(entityService.getOne(key).thenApply(keo -> new DetailsViewState<>(keo.map(ke -> ke.data),
                                                                                              keo.map(ke -> ke.key))),
                         (gridState, edit) ->  new rsp.admin.crud.components.Resource.State<>(name, title, gridState, Optional.of(edit)));
     }
@@ -148,24 +148,24 @@ public class Resource<T> implements Component<rsp.admin.crud.components.Resource
             this.details = details;
         }
 
-        public State withList(DataGrid.Table<?, ?> gs) {
+        public State<T> withList(DataGrid.Table<?, ?> gs) {
             return new State(name, title, gs, Optional.empty());
         }
 
-        public State withEdit(DetailsViewState<T> edit) {
-            return new State(name, title, list, Optional.of(edit));
+        public State<T> withEdit(DetailsViewState<T> edit) {
+            return new State<>(name, title, list, Optional.of(edit));
         }
 
-        public State hideDetails() {
-            return new State(name, title, list, Optional.empty());
+        public State<T> hideDetails() {
+            return new State<>(name, title, list, Optional.empty());
         }
 
-        public State withEditData(KeyedEntity<String, T> data) {
-            return new State(name, title, list, Optional.of(new DetailsViewState<T>(Optional.of(data.data), Optional.of(data.key))));
+        public State<T> withEditData(KeyedEntity<String, T> data) {
+            return new State<>(name, title, list, Optional.of(new DetailsViewState<>(Optional.of(data.data), Optional.of(data.key))));
         }
 
-        public State withCreate() {
-            return new State(name, title, list, Optional.of(new DetailsViewState(Optional.empty(), Optional.empty())));
+        public State<T> withCreate() {
+            return new State<T>(name, title, list, Optional.of(new DetailsViewState(Optional.empty(), Optional.empty())));
         }
 
     }
