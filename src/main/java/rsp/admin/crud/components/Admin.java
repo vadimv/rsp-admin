@@ -34,7 +34,7 @@ public class Admin {
     }
 
     public App<State> app() {
-        return new App<>(AppConfig.DEFAULT,
+        return new App<State>(AppConfig.DEFAULT,
                          request -> dispatch(request.deviceId().flatMap(id -> Optional.ofNullable(principals.get(id))),
                                              request.path),
                          this::stateToPath,
@@ -44,13 +44,13 @@ public class Admin {
 
     private CompletableFuture<State> dispatch(Optional<Principal> principal, Path path) {
 
-        final Path.Matcher<State> m = path.matcher(CompletableFuture.completedFuture(error()))
-                                          .when((name) -> "login".equals(name),
+        final Path.Matcher<State> m = path.createMatcher(error())
+                                          .match((name) -> "login".equals(name),
                                                 (name) -> CompletableFuture.completedFuture(new rsp.admin.crud.components.Admin.State(Optional.empty(), Optional.empty())));
         for (Resource<?> resource : resources) {
-            final Path.Matcher<State> sm = m.when((name) -> name.equals(resource.name),
+            final Path.Matcher<State> sm = m.match((name) -> name.equals(resource.name),
                                                   (name) -> resource.initialListState().thenApply(resourceState -> new State(principal, Optional.of(resourceState))))
-                                            .when((name, key) -> name.equals(resource.name),
+                                            .match((name, key) -> name.equals(resource.name),
                                                   (name, key) -> resource.initialListStateWithEdit(key).thenApply(resourceState -> new State(principal, Optional.of(resourceState))));
             if (sm.isMatch) {
                 return sm.result;
@@ -63,7 +63,7 @@ public class Admin {
         return new State(Optional.empty(), Optional.empty());
     }
 
-    private Path stateToPath(State s) {
+    private Path stateToPath(State s, Path p) {
         if (s.user.isPresent()) {
             return s.currentResource.map(state -> state.details.map(detailsViewState -> Path.of(state.name
                                                     + "/" + detailsViewState.currentKey.orElse("create")))
