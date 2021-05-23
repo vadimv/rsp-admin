@@ -35,20 +35,23 @@ public class Admin {
         this.resources = resources;
     }
 
-    public App<State> app() {
+    public App<AppState> app() {
 
-        final PageLifeCycle<State> pageLifeCycle = new PageLifeCycle<>() {
+        final PageLifeCycle<AppState> pageLifeCycle = new PageLifeCycle<>() {
             @Override
-            public void beforeLivePageCreated(QualifiedSessionId sid, UseState<State> useState) {
+            public void beforeLivePageCreated(QualifiedSessionId sid, UseState<AppState> useState) {
                 pubSub.subscribe(sid.deviceId, sid.sessionId, message -> {
                     synchronized (useState) {
-                        useState.accept(useState.get().withoutPrincipal());
+                        if (useState.isInstanceOf(State.class))
+                        {
+                            useState.accept(useState.cast(State.class).get().withoutPrincipal());
+                        }
                     }
                 });
             }
 
             @Override
-            public void afterLivePageClosed(QualifiedSessionId sid, State state) {
+            public void afterLivePageClosed(QualifiedSessionId sid, AppState state) {
                 pubSub.unsubscribe(sid.deviceId, sid.sessionId);
             }
         };
@@ -61,16 +64,19 @@ public class Admin {
                          this::appRoot);
     }
 
-    private CompletableFuture<State> dispatch(Optional<Tuple2<String, Principal>> principal, Path path) {
+    private CompletableFuture<? extends AppState> dispatch(Optional<Tuple2<String, Principal>> principal, Path path) {
 
-        final Path.Matcher<State> m = path.createMatcher(error())
+        final Path.Matcher<AppState> m = new Path.Matcher<AppState>(path, new NotFoundState())
                                           .match((name) -> "login".equals(name),
                                                 (name) -> CompletableFuture.completedFuture(new rsp.admin.crud.components.Admin.State(Optional.empty(), Optional.empty())));
+
         for (Resource<?> resource : resources) {
-            final Path.Matcher<State> sm = m.match((name) -> name.equals(resource.name),
-                                                  (name) -> resource.initialListState().thenApply(resourceState -> new State(principal, Optional.of(resourceState))))
+            final Path.Matcher<? extends AppState> sm = m.match(() -> true,
+                                                                () -> CompletableFuture.completedFuture(new State(principal, Optional.empty())))
+                                            .match((name) -> name.equals(resource.name),
+                                                   (name) -> resource.initialListState().thenApply(resourceState -> new State(principal, Optional.of(resourceState))))
                                             .match((name, key) -> name.equals(resource.name),
-                                                  (name, key) -> resource.initialListStateWithEdit(key).thenApply(resourceState -> new State(principal, Optional.of(resourceState))));
+                                                   (name, key) -> resource.initialListStateWithEdit(key).thenApply(resourceState -> new State(principal, Optional.of(resourceState))));
             if (sm.isMatch) {
                 return sm.result;
             }
@@ -78,25 +84,53 @@ public class Admin {
         return m.result;
     }
 
-    private State error() {
-        return new State(Optional.empty(), Optional.empty());
+    private AppState error() {
+        return new ErrorState();
     }
 
-    private Path stateToPath(State s, Path p) {
-        if (s.principal.isPresent()) {
-            return s.currentResource.map(state -> state.details.map(detailsViewState -> Path.of(state.name
-                                                    + "/" + detailsViewState.currentKey.orElse("create")))
-                                    .orElseGet(() -> Path.of(state.name))).orElse(Path.EMPTY_ABSOLUTE);
+    private Path stateToPath(AppState appState, Path p) {
+        if (appState instanceof State) {
+            final var s = (State) appState;
+            if (s.principal.isPresent()) {
+                return s.currentResource.map(state -> state.details.map(detailsViewState -> Path.of(state.name
+                        + "/" + detailsViewState.currentKey.orElse("create")))
+                        .orElseGet(() -> Path.of(state.name))).orElse(Path.EMPTY_ABSOLUTE);
+            } else {
+                return Path.of("login");
+            }
+        } else if (appState instanceof NotFoundState){
+            Path.of("notFound");
+        }
+        assert appState instanceof ErrorState;
+        return Path.of("error");
+    }
+
+    private DocumentPartDefinition appRoot(UseState<AppState> us) {
+        if (us.isInstanceOf(State.class)) {
+            return appRootOk(us.cast(State.class));
+        } else if (us.isInstanceOf(NotFoundState.class)) {
+            return appRootNotFound();
         } else {
-            return Path.of("login");
+            throw new IllegalStateException();
         }
     }
 
-    private DocumentPartDefinition appRoot(UseState<rsp.admin.crud.components.Admin.State> us) {
+    private DocumentPartDefinition appRootNotFound() {
+        return html(headPlain(title("Not found")),
+                    body(h2("404"))).statusCode(404);
+    }
+
+    private DocumentPartDefinition appRootOk(UseState<State> us) {
         return html(window().on("popstate",
                                 ctx ->
             ctx.eventObject().value("path").ifPresent(path -> dispatch(us.get().principal, Path.of(path.toString()))
-                                                                         .thenAccept(us)))
+                                                                         .thenAccept(s -> {
+                                                                             if (s instanceof State) {
+                                                                                 us.accept((State) s);
+                                                                             } else {
+                                                                                 throw new IllegalStateException("Bad path: " + path);
+                                                                             }
+                                                                         })))
         ,
                     head(title(title + us.get().currentResource.map(r -> ": " + r.title).orElse("")),
                          link(attr("rel", "stylesheet"), attr("href","/res/style.css"))),
@@ -125,7 +159,16 @@ public class Admin {
         return Arrays.stream(resources).filter(resource -> resource.name.equals(resourceState.name)).map(component -> new Tuple2<>(resourceState, component)).findFirst();
     }
 
-    public static class State {
+    interface AppState {
+    }
+
+    public static class ErrorState implements AppState {
+    }
+
+    public static class NotFoundState implements AppState {
+    }
+
+    public static class State implements AppState {
         public final Optional<Tuple2<String, Principal>> principal;
         public final Optional<Resource.State<?>> currentResource;
 
