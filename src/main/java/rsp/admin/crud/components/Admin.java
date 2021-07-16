@@ -42,10 +42,7 @@ public class Admin {
             public void beforeLivePageCreated(QualifiedSessionId sid, UseState<AppState> useState) {
                 pubSub.subscribe(sid.deviceId, sid.sessionId, message -> {
                     synchronized (useState) {
-                        if (useState.isInstanceOf(State.class))
-                        {
-                            useState.accept(useState.cast(State.class).get().withoutPrincipal());
-                        }
+                        useState.accept(useState.cast(State.class).get().withoutPrincipal());
                     }
                 });
             }
@@ -78,10 +75,11 @@ public class Admin {
                                             .match((name, key) -> name.equals(resource.name),
                                                    (name, key) -> resource.initialListStateWithEdit(key).thenApply(resourceState -> new State(principal, Optional.of(resourceState))));
             if (sm.isMatch) {
-                return sm.result;
+                return sm.state;
             }
         }
-        return m.result;
+
+        return m.state;
     }
 
     private AppState error() {
