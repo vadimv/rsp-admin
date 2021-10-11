@@ -13,6 +13,7 @@ import rsp.state.UseState;
 import rsp.util.data.Tuple2;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -25,7 +26,7 @@ import static rsp.state.UseState.readWrite;
 
 public class Admin {
     private final String title;
-    private final Resource[] resources;
+    private final List<Resource> resources;
 
     private static final Map<String, Principal> principals = new ConcurrentHashMap<>();
 
@@ -34,7 +35,7 @@ public class Admin {
 
     public Admin(String title, Resource<?>... resources) {
         this.title = title;
-        this.resources = resources;
+        this.resources = Arrays.asList(resources);
     }
 
     public App<AppState> app() {
@@ -95,7 +96,7 @@ public class Admin {
     }
 
     private Optional<Resource> resource(String name) {
-        return Arrays.stream(resources).filter(r -> name.equals(r.name)).findFirst();
+        return resources.stream().filter(r -> name.equals(r.name)).findFirst();
     }
 
     private NotFoundState notFound() {
@@ -151,7 +152,7 @@ public class Admin {
                                                             pubSub.publish(ctx.sessionId().deviceId, "logout");
                                                             us.accept(us.get().withoutPrincipal());
                                                          }))),
-                                                    new MenuPanel().render(new MenuPanel.State(Arrays.stream(resources).map(r -> new Tuple2<>(r.name, r.title)).collect(Collectors.toList()))),
+                                                    new MenuPanel().render(new MenuPanel.State(resources.stream().map(r -> new Tuple2<>(r.name, r.title)).collect(Collectors.toList()))),
 
                                 div(of(us.get().currentResource.flatMap(this::findResourceComponent).map(p -> p._2.render(readWrite(() -> p._1,
                                                                                                                             v -> us.accept(us.get().withResource(Optional.of(v)))))).stream()))))
@@ -167,7 +168,7 @@ public class Admin {
     }
 
     private Optional<Tuple2<Resource.State, Resource>> findResourceComponent(Resource.State resourceState) {
-        return Arrays.stream(resources).filter(resource -> resource.name.equals(resourceState.name)).map(component -> new Tuple2<>(resourceState, component)).findFirst();
+        return resources.stream().filter(resource -> resource.name.equals(resourceState.name)).map(component -> new Tuple2<>(resourceState, component)).findFirst();
     }
 
     interface AppState {

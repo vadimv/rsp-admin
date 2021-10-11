@@ -10,7 +10,6 @@ import static rsp.html.HtmlDsl.*;
 
 public class LoginForm implements Component<rsp.admin.crud.components.LoginForm.State> {
 
-
     @Override
     public DocumentPartDefinition render(UseState<State> us) {
         return div(attr("class", "login"),

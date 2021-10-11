@@ -6,10 +6,7 @@ import rsp.state.UseState;
 import rsp.util.data.Tuple2;
 import rsp.util.json.JsonDataType;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -19,11 +16,11 @@ import static rsp.html.HtmlDsl.*;
 public class Form implements Component<rsp.admin.crud.components.Form.State> {
 
     private final Consumer<Function<String, Optional<String>>> submittedData;
-    private final TextInput[] fieldsComponents;
+    private final List<TextInput> fieldsComponents;
 
     public Form(Consumer<Function<String, Optional<String>>> submittedData, TextInput... fieldsComponents) {
         this.submittedData = submittedData;
-        this.fieldsComponents = fieldsComponents;
+        this.fieldsComponents = Arrays.asList(fieldsComponents);
     }
 
 
@@ -33,10 +30,10 @@ public class Form implements Component<rsp.admin.crud.components.Form.State> {
             div(form(on("submit", c -> {
                         // Validate all fieldComponents, if any is invalid update state with validation messages, if all valid accept the values
                         final Map<String, String> topValidationErrors =
-                                Arrays.stream(fieldsComponents).map(component ->
+                                fieldsComponents.stream().map(component ->
                                     new Tuple2<>(component.fieldName,
                                                  c.eventObject().value(component.fieldName).stream().flatMap(value ->
-                                                                    Arrays.stream(component.validations()).flatMap(validation ->
+                                                                       component.validations.stream().flatMap(validation ->
                                                                               validation.apply(value.toString()).stream())).collect(Collectors.toList())))
                                         .filter(t -> t._2.size() > 0)
                                         .collect(Collectors.toMap(t -> t._1, t -> t._2.get(0)));
@@ -51,7 +48,7 @@ public class Form implements Component<rsp.admin.crud.components.Form.State> {
                                 }));
                             }
                         }),
-                        of(Arrays.stream(fieldsComponents).map(component ->
+                        of(fieldsComponents.stream().map(component ->
                                 div(component.render(Optional.ofNullable(useState.get().validationErrors.get(component.fieldName)))))),
                         button(attr("type", "submit"), text("Ok")),
                         button(attr("type", "button"),

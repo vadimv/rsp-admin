@@ -28,10 +28,10 @@ public class DetailsViewState<T> {
     }
 
     public rsp.admin.crud.components.DetailsViewState<T> withValue(T value) {
-        return new rsp.admin.crud.components.DetailsViewState<T>(Optional.of(value), this.currentKey, this.validationErrors);
+        return new rsp.admin.crud.components.DetailsViewState<>(Optional.of(value), this.currentKey, this.validationErrors);
     }
 
     public rsp.admin.crud.components.DetailsViewState<T> withValidationErrors(Map<String, String> validationErrors) {
-        return new rsp.admin.crud.components.DetailsViewState<T>(this.currentValue, this.currentKey, validationErrors);
+        return new rsp.admin.crud.components.DetailsViewState<>(this.currentValue, this.currentKey, validationErrors);
     }
 }

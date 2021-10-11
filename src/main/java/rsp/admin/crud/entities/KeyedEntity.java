@@ -37,7 +37,7 @@ public class KeyedEntity<K, T> {
 
     private Tuple2 readField(Field f, T data) {
         try {
-            return new Tuple2(f.getName(), f.get(data));
+            return new Tuple2<>(f.getName(), f.get(data));
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }

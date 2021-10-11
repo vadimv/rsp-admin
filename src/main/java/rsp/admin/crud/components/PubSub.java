@@ -1,7 +1,6 @@
 package rsp.admin.crud.components;
 
 
-import com.google.protobuf.MapEntry;
 import rsp.util.data.Tuple2;
 
 import java.util.Map;

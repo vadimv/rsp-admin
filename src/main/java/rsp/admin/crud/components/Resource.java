@@ -58,14 +58,13 @@ public class Resource<T> implements Component<rsp.admin.crud.components.Resource
 
     public CompletableFuture<rsp.admin.crud.components.Resource.State<T>> initialListState() {
         return entityService.getList(0, DEFAULT_PAGE_SIZE)
-                .thenApply(entities -> new DataGrid.Table<String, T>(entities.toArray(new KeyedEntity[0]), new HashSet<>()))
+                .thenApply(entities -> new DataGrid.Table<>(entities, new HashSet<>()))
                 .thenApply(gridState -> new rsp.admin.crud.components.Resource.State<>(name, title, gridState, Optional.empty()));
     }
 
     public CompletableFuture<rsp.admin.crud.components.Resource.State<T>> initialListStateWithEdit(String key) {
             return entityService.getList(0, DEFAULT_PAGE_SIZE)
-                .thenApply(entities -> new DataGrid.Table<String, T>(entities.toArray(new KeyedEntity[0]),
-                                                                     new HashSet<>()))
+                .thenApply(entities -> new DataGrid.Table<>(entities, new HashSet<>()))
                 .thenCombine(entityService.getOne(key).thenApply(keo -> new DetailsViewState<>(keo.map(ke -> ke.data),
                                                                                              keo.map(ke -> ke.key))),
                         (gridState, edit) ->  new rsp.admin.crud.components.Resource.State<>(name, title, gridState, Optional.of(edit)));
@@ -77,9 +76,7 @@ public class Resource<T> implements Component<rsp.admin.crud.components.Resource
     public DocumentPartDefinition render(UseState<rsp.admin.crud.components.Resource.State<T>> us) {
         return div(div(when(createComponent.isPresent(), button(attr("type", "button"),
                                                                 text("Create"),
-                                                                on("click", ctx -> {
-                                                                     us.accept(us.get().withCreate());
-                                                                }))),
+                                                                on("click", ctx -> us.accept(us.get().withCreate())))),
                     button(attr("type", "button"),
                             when(us.get().list.selectedRows.size() == 0, () -> attr("disabled")),
                             text("Delete"),
@@ -87,10 +84,9 @@ public class Resource<T> implements Component<rsp.admin.crud.components.Resource
                                     final Set<KeyedEntity<String, T>> rows = us.get().list.selectedRows;
                                     StreamUtils.sequence(rows.stream().map(r -> entityService.delete(r.key))
                                                .collect(Collectors.toList()))
-                                               .thenAccept(l -> entityService.getList(0, DEFAULT_PAGE_SIZE).thenAccept(entities -> {
-                                                      us.accept(us.get().withList(new DataGrid.Table<>(entities.toArray(new KeyedEntity[0]),
-                                                                                         new HashSet<>())));
-                                               }));
+                                               .thenAccept(l -> entityService.getList(0, DEFAULT_PAGE_SIZE)
+                                                                             .thenAccept(entities -> us.accept(us.get().withList(new DataGrid.Table<>(entities,
+                                                                                                                                                      new HashSet<>())))));
                                 }))),
                     listComponent.render(us.get().list,
                                          gridState -> gridState.editRowKey.ifPresentOrElse(
@@ -116,15 +112,14 @@ public class Resource<T> implements Component<rsp.admin.crud.components.Resource
                 entityService.update(new KeyedEntity<>(editState.currentKey.get(), editState.currentValue.get()))
                         .thenCompose(u -> entityService.getList(0, DEFAULT_PAGE_SIZE))
                         .thenAccept(entities ->
-                                us.accept(us.get().withList(new DataGrid.Table<>(entities.toArray(new KeyedEntity[0]),
-                                                            new HashSet<>())))).join();
+                                us.accept(us.get().withList(new DataGrid.Table<>(entities, new HashSet<>())))).join();
 
             } else if (editState.currentValue.isPresent()) {
                 // create
                 entityService.create(editState.currentValue.get())
                         .thenCompose(u -> entityService.getList(0, DEFAULT_PAGE_SIZE))
                         .thenAccept(entities ->
-                                us.accept(us.get().withList(new DataGrid.Table<>(entities.toArray(new KeyedEntity[0]),
+                                us.accept(us.get().withList(new DataGrid.Table<>(entities,
                                         new HashSet<>())))).join();
             } else {
                 us.accept(us.get().hideDetails());
@@ -165,7 +160,7 @@ public class Resource<T> implements Component<rsp.admin.crud.components.Resource
         }
 
         public State<T> withCreate() {
-            return new State<T>(name, title, list, Optional.of(new DetailsViewState(Optional.empty(), Optional.empty())));
+            return new State<>(name, title, list, Optional.of(new DetailsViewState<>(Optional.empty(), Optional.empty())));
         }
 
     }

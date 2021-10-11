@@ -4,6 +4,8 @@ import rsp.Component;
 import rsp.html.DocumentPartDefinition;
 import rsp.state.UseState;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -18,7 +20,7 @@ public class TextInput implements Component<Optional<String>> {
     private final Type type;
     private final String labelText;
     private final String initialValue;
-    private final Function<String, Optional<String>>[] validations;
+    public final List<Function<String, Optional<String>>> validations;
 
     @SafeVarargs
     public TextInput(String fieldName,
@@ -30,7 +32,7 @@ public class TextInput implements Component<Optional<String>> {
         this.type = type;
         this.labelText = labelText;
         this.initialValue = initialValue;
-        this.validations = validations;
+        this.validations = Arrays.asList(validations);
     }
 
     @Override
@@ -43,7 +45,4 @@ public class TextInput implements Component<Optional<String>> {
                                                                                  text(validationErrorMessage)))));
     }
 
-    public Function<String, Optional<String>>[] validations() {
-        return validations;
-    }
 }
