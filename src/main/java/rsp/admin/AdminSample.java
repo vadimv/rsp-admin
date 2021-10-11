@@ -50,11 +50,11 @@ public class AdminSample {
                                                      new EditForm<>(new TextInput<>("title", s -> s)),
                                                      new EditForm<String, Book>(new InitialValue<>(new TextInput<>("title", s -> s), "")))));
 */
-        final var s = new JettyServer(DEFAULT_PORT,
-                                    "/",
-                                      admin.app(),
-                                      new StaticResources(new File("src/main/java/rsp/admin"),
-                                                                               "/res/*"));
+        final var s = new JettyServer<>(DEFAULT_PORT,
+                                       "/",
+                                        admin.app(),
+                                        new StaticResources(new File("src/main/java/rsp/admin"),
+                                                            "/res/*"));
         s.start();
         s.join();
     }

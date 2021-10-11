@@ -16,11 +16,11 @@ public class DetailsViewState<T> {
         this.validationErrors = validationErrors;
     }
     public DetailsViewState(Optional<T> value, Optional<String> key) {
-        this(value, key, Collections.EMPTY_MAP);
+        this(value, key, Collections.emptyMap());
     }
 
     public DetailsViewState() {
-        this(Optional.empty(), Optional.empty(), Collections.EMPTY_MAP);
+        this(Optional.empty(), Optional.empty(), Collections.emptyMap());
     }
 
     public rsp.admin.crud.components.DetailsViewState<T> show() {
