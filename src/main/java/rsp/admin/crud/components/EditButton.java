@@ -1,11 +1,11 @@
 package rsp.admin.crud.components;
 
 import rsp.Component;
-import rsp.dsl.DocumentPartDefinition;
+import rsp.html.DocumentPartDefinition;
 import rsp.state.UseState;
 
-import static rsp.dsl.Html.a;
-import static rsp.dsl.Html.on;
+import static rsp.html.HtmlDsl.a;
+import static rsp.html.HtmlDsl.on;
 
 public class EditButton implements Component<String> {
 

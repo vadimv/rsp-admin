@@ -1,12 +1,13 @@
 package rsp.admin.crud.components;
 
 import rsp.App;
-import rsp.AppConfig;
 import rsp.admin.crud.entities.Principal;
 import rsp.admin.crud.services.Auth;
-import rsp.dsl.DocumentPartDefinition;
+import rsp.html.DocumentPartDefinition;
 import rsp.page.PageLifeCycle;
 import rsp.page.QualifiedSessionId;
+import rsp.routing.Route;
+import rsp.server.HttpRequest;
 import rsp.server.Path;
 import rsp.state.UseState;
 import rsp.util.data.Tuple2;
@@ -18,7 +19,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-import static rsp.dsl.Html.*;
+import static rsp.html.HtmlDsl.*;
+import static rsp.routing.RoutingDsl.*;
 import static rsp.state.UseState.readWrite;
 
 public class Admin {
@@ -53,33 +55,51 @@ public class Admin {
             }
         };
 
-        return new App<>(AppConfig.DEFAULT,
-                         request -> dispatch(request.deviceId().flatMap(id -> Optional.ofNullable(principals.get(id)).map(p -> new Tuple2<>(id, p))),
-                                             request.path),
-                         this::stateToPath,
-                         pageLifeCycle,
-                         this::appRoot);
+        return new App<>(routes(),
+                         this::appRoot).stateToPath(this::stateToPath)
+                                       .pageLifeCycle(pageLifeCycle);
     }
 
-    private CompletableFuture<? extends AppState> dispatch(Optional<Tuple2<String, Principal>> principal, Path path) {
+    private Route<HttpRequest, AppState> routes() {
+        return concat(get(req -> paths(principal(req.deviceId()))),
+                      any(notFound()));
+    }
 
-        final Path.Matcher<AppState> m = new Path.Matcher<AppState>(path, new NotFoundState())
-                                          .match((name) -> "login".equals(name),
-                                                (name) -> CompletableFuture.completedFuture(new rsp.admin.crud.components.Admin.State(Optional.empty(), Optional.empty())));
+    private Route<Path, AppState> paths(Optional<Tuple2<String, Principal>> principal) {
+        return concat(path("",  CompletableFuture.completedFuture(new State(principal, Optional.empty()))),
+                      path("/login", CompletableFuture.completedFuture(new State(Optional.empty(), Optional.empty()))),
+                      path("/:resourceName", resourceName -> resourceList(resourceName, principal)),
+                      path( "/:resourceName/:key", (resourceName, key) -> resourceDetails(resourceName, key, principal)));
+    }
 
-        for (Resource<?> resource : resources) {
-            final Path.Matcher<? extends AppState> sm = m.match(() -> true,
-                                                                () -> CompletableFuture.completedFuture(new State(principal, Optional.empty())))
-                                            .match((name) -> name.equals(resource.name),
-                                                   (name) -> resource.initialListState().thenApply(resourceState -> new State(principal, Optional.of(resourceState))))
-                                            .match((name, key) -> name.equals(resource.name),
-                                                   (name, key) -> resource.initialListStateWithEdit(key).thenApply(resourceState -> new State(principal, Optional.of(resourceState))));
-            if (sm.isMatch) {
-                return sm.state;
-            }
-        }
+    private Optional<Tuple2<String, Principal>> principal(Optional<String> deviceId) {
+        return deviceId.flatMap(id -> Optional.ofNullable(principals.get(id)).map(p -> new Tuple2<>(id, p)));
+    }
 
-        return m.state;
+    private CompletableFuture<AppState> resourceList(String resourceName, Optional<Tuple2<String, Principal>> principal) {
+        return  resource(resourceName).map(resource -> listState(principal, resource))
+                .orElse(CompletableFuture.completedFuture(notFound()));
+    }
+
+    private CompletableFuture<AppState> listState(Optional<Tuple2<String, Principal>> principal, Resource<?> resource) {
+        return resource.initialListState().thenApply(resourceState -> new State(principal, Optional.of(resourceState)));
+    }
+
+    private CompletableFuture<AppState> resourceDetails(String resourceName, String key,  Optional<Tuple2<String, Principal>> principal) {
+        return  resource(resourceName).map(resource -> listStateWKey(principal, resource, key))
+                      .orElse(CompletableFuture.completedFuture(notFound()));
+    }
+
+    private CompletableFuture<AppState> listStateWKey(Optional<Tuple2<String, Principal>> principal, Resource<?> resource, String key) {
+        return resource.initialListStateWithEdit(key).thenApply(resourceState -> new State(principal, Optional.of(resourceState)));
+    }
+
+    private Optional<Resource> resource(String name) {
+        return Arrays.stream(resources).filter(r -> name.equals(r.name)).findFirst();
+    }
+
+    private NotFoundState notFound() {
+        return new NotFoundState();
     }
 
     private AppState error() {
@@ -121,15 +141,8 @@ public class Admin {
     private DocumentPartDefinition appRootOk(UseState<State> us) {
         return html(window().on("popstate",
                                 ctx ->
-            ctx.eventObject().value("path").ifPresent(path -> dispatch(us.get().principal, Path.of(path.toString()))
-                                                                         .thenAccept(s -> {
-                                                                             if (s instanceof State) {
-                                                                                 us.accept((State) s);
-                                                                             } else {
-                                                                                 throw new IllegalStateException("Bad path: " + path);
-                                                                             }
-                                                                         })))
-        ,
+            ctx.eventObject().value("path").flatMap(path -> paths(us.get().principal).apply(Path.of(path.toString())))
+                    .ifPresent(state -> state.thenAccept(s -> us.accept((State)s)))),
                     head(title(title + us.get().currentResource.map(r -> ": " + r.title).orElse("")),
                          link(attr("rel", "stylesheet"), attr("href","/res/style.css"))),
                     body(us.get().principal.map(u -> div(div(span(u._2.name),

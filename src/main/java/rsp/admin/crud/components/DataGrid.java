@@ -2,12 +2,12 @@ package rsp.admin.crud.components;
 
 import rsp.Component;
 import rsp.admin.crud.entities.KeyedEntity;
-import rsp.dsl.DocumentPartDefinition;
+import rsp.html.DocumentPartDefinition;
 import rsp.state.UseState;
 
 import java.util.*;
 
-import static rsp.dsl.Html.*;
+import static rsp.html.HtmlDsl.*;
 
 public class DataGrid<T> implements Component<rsp.admin.crud.components.DataGrid.Table<String, T>> {
 

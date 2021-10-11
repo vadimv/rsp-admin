@@ -1,12 +1,12 @@
 package rsp.admin.crud.components;
 
 import rsp.Component;
-import rsp.dsl.DocumentPartDefinition;
+import rsp.html.DocumentPartDefinition;
 import rsp.state.UseState;
 
 import java.util.Optional;
 
-import static rsp.dsl.Html.*;
+import static rsp.html.HtmlDsl.*;
 
 public class LoginForm implements Component<rsp.admin.crud.components.LoginForm.State> {
 

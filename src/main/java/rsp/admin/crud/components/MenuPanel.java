@@ -1,14 +1,13 @@
 package rsp.admin.crud.components;
 
 import rsp.Component;
-import rsp.dsl.DocumentPartDefinition;
-import rsp.dsl.Html;
+import rsp.html.DocumentPartDefinition;
 import rsp.state.UseState;
 import rsp.util.data.Tuple2;
 
 import java.util.List;
 
-import static rsp.dsl.Html.*;
+import static rsp.html.HtmlDsl.*;
 
 public class MenuPanel implements Component<rsp.admin.crud.components.MenuPanel.State> {
 
@@ -16,7 +15,7 @@ public class MenuPanel implements Component<rsp.admin.crud.components.MenuPanel.
     public DocumentPartDefinition render(UseState<State> state) {
         return div(
                     ul(
-                        Html.of(state.get().resourcesInfos.stream().map(r -> li(a("/" + r._1, r._2)))
+                        of(state.get().resourcesInfos.stream().map(r -> li(a("/" + r._1, r._2)))
                     )));
     }
 

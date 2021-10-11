@@ -1,12 +1,12 @@
 package rsp.admin.crud.components;
 
 import rsp.Component;
-import rsp.dsl.DocumentPartDefinition;
+import rsp.html.DocumentPartDefinition;
 import rsp.state.UseState;
 
 import java.util.Objects;
 
-import static rsp.dsl.Html.text;
+import static rsp.html.HtmlDsl.text;
 
 public class TextField<T> implements Component<String> {
     private final T data;

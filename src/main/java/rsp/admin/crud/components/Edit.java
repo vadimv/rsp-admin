@@ -1,13 +1,13 @@
 package rsp.admin.crud.components;
 
 import rsp.Component;
-import rsp.dsl.DocumentPartDefinition;
+import rsp.html.DocumentPartDefinition;
 import rsp.state.UseState;
 
 import java.util.Collections;
 import java.util.function.Function;
 
-import static rsp.dsl.Html.*;
+import static rsp.html.HtmlDsl.*;
 
 public class Edit<T> implements Component<DetailsViewState<T>> {
     private final Function<UseState<T>, Form> formFunction;

@@ -1,15 +1,15 @@
 package rsp.admin.crud.components;
 
 import rsp.Component;
-import rsp.dsl.DocumentPartDefinition;
+import rsp.html.DocumentPartDefinition;
 import rsp.state.UseState;
 
 import java.util.Collections;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import static rsp.dsl.Html.div;
-import static rsp.dsl.Html.span;
+import static rsp.html.HtmlDsl.div;
+import static rsp.html.HtmlDsl.span;
 import static rsp.state.UseState.readWrite;
 
 public class Create<T> implements Component<DetailsViewState<T>> {

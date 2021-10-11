@@ -3,7 +3,7 @@ package rsp.admin.crud.components;
 import rsp.Component;
 import rsp.admin.crud.entities.KeyedEntity;
 import rsp.admin.crud.services.EntityService;
-import rsp.dsl.DocumentPartDefinition;
+import rsp.html.DocumentPartDefinition;
 import rsp.state.UseState;
 import rsp.util.StreamUtils;
 
@@ -13,7 +13,7 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
-import static rsp.dsl.Html.*;
+import static rsp.html.HtmlDsl.*;
 import static rsp.state.UseState.readWrite;
 
 public class Resource<T> implements Component<rsp.admin.crud.components.Resource.State<T>> {

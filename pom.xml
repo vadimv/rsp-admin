@@ -6,7 +6,7 @@
 
     <groupId>io.github.vadimv</groupId>
     <artifactId>rsp-admin</artifactId>
-    <version>0.1-SNAPSHOT</version>
+    <version>0.2-SNAPSHOT</version>
     <dependencies>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
@@ -17,7 +17,7 @@
         <dependency>
             <groupId>io.github.vadimv</groupId>
             <artifactId>rsp</artifactId>
-            <version>0.5-SNAPSHOT</version>
+            <version>0.6-SNAPSHOT</version>
         </dependency>
 
     </dependencies>
@@ -35,6 +35,9 @@
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
+                    <compilerArgs>
+                        <arg>-Xlint:all</arg>
+                    </compilerArgs>
                 </configuration>
             </plugin>
 
