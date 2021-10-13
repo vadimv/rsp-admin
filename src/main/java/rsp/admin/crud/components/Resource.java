@@ -143,8 +143,8 @@ public class Resource<T> implements Component<rsp.admin.crud.components.Resource
             this.details = details;
         }
 
-        public State<T> withList(DataGrid.Table<?, ?> gs) {
-            return new State(name, title, gs, Optional.empty());
+        public State<T> withList(DataGrid.Table<String, T> gs) {
+            return new State<T>(name, title, gs, Optional.empty());
         }
 
         public State<T> withEdit(DetailsViewState<T> edit) {
