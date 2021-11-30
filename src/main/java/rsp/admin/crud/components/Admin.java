@@ -111,7 +111,7 @@ public class Admin {
         if (appState instanceof State) {
             final var s = (State) appState;
             if (s.principal.isPresent()) {
-                return s.currentResource.map(state -> state.details.map(detailsViewState -> Path.of(state.name
+                return s.resourceState.map(state -> state.details.map(detailsViewState -> Path.of(state.name
                         + "/" + detailsViewState.currentKey.orElse("create")))
                         .orElseGet(() -> Path.of(state.name))).orElse(Path.EMPTY_ABSOLUTE);
             } else {
@@ -144,7 +144,7 @@ public class Admin {
                                 ctx ->
             ctx.eventObject().value("path").flatMap(path -> paths(us.get().principal).apply(Path.of(path.toString())))
                     .ifPresent(state -> state.thenAccept(s -> us.accept((State)s)))),
-                    head(title(title + us.get().currentResource.map(r -> ": " + r.title).orElse("")),
+                    head(title(title + us.get().resourceState.map(r -> ": " + r.title).orElse("")),
                          link(attr("rel", "stylesheet"), attr("href","/res/style.css"))),
                     body(us.get().principal.map(u -> div(div(span(u._2.name),
                                                         a("#", "Logout", on("click", ctx -> {
@@ -154,8 +154,8 @@ public class Admin {
                                                          }))),
                                                     new MenuPanel().render(new MenuPanel.State(resources.stream().map(r -> new Tuple2<>(r.name, r.title)).collect(Collectors.toList()))),
 
-                                div(of(us.get().currentResource.flatMap(this::findResourceComponent).map(p -> p._2.render(readWrite(() -> p._1,
-                                                                                                                            v -> us.accept(us.get().withResource(Optional.of(v)))))).stream()))))
+                                div(of(us.get().resourceState.flatMap(rs -> findResource(rs.name).map(p -> p.render(readWrite(() -> rs,
+                                                                                                                            v -> us.accept(us.get().withResource(Optional.of(v))))))).stream()))))
 
                                 .orElse(div(new LoginForm().render(new LoginForm.State(),
                                                                lfs -> auth.authenticate(lfs.userName, lfs.password)
@@ -167,8 +167,8 @@ public class Admin {
                     ));
     }
 
-    private Optional<Tuple2<Resource.State, Resource>> findResourceComponent(Resource.State resourceState) {
-        return resources.stream().filter(resource -> resource.name.equals(resourceState.name)).map(component -> new Tuple2<>(resourceState, component)).findFirst();
+    private Optional<Resource> findResource(String resourceName) {
+        return resources.stream().filter(resource -> resource.name.equals(resourceName)).findFirst();
     }
 
     interface AppState {
@@ -182,11 +182,11 @@ public class Admin {
 
     public static class State implements AppState {
         public final Optional<Tuple2<String, Principal>> principal;
-        public final Optional<Resource.State<?>> currentResource;
+        public final Optional<Resource.State<?>> resourceState;
 
-        public State(Optional<Tuple2<String, Principal>> principal, Optional<Resource.State<?>> currentResource) {
+        public State(Optional<Tuple2<String, Principal>> principal, Optional<Resource.State<?>> resourceState) {
             this.principal = principal;
-            this.currentResource = currentResource;
+            this.resourceState = resourceState;
         }
 
         public State withResource(Optional<Resource.State<?>> currentResource) {
@@ -194,11 +194,11 @@ public class Admin {
         }
 
         public State withPrincipal(Tuple2<String, Principal> principal) {
-            return new State(Optional.of(principal), this.currentResource);
+            return new State(Optional.of(principal), this.resourceState);
         }
 
         public State withoutPrincipal() {
-            return new State(Optional.empty(), this.currentResource);
+            return new State(Optional.empty(), this.resourceState);
         }
     }
 }
