@@ -19,6 +19,7 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static rsp.html.HtmlDsl.*;
 import static rsp.routing.RoutingDsl.*;
@@ -154,17 +155,23 @@ public class Admin {
                                                          }))),
                                                     new MenuPanel().render(new MenuPanel.State(resources.stream().map(r -> new Tuple2<>(r.name, r.title)).collect(Collectors.toList()))),
 
-                                div(of(us.get().resourceState.flatMap(rs -> findResource(rs.name).map(p -> p.render(readWrite(() -> rs,
-                                                                                                                            v -> us.accept(us.get().withResource(Optional.of(v))))))).stream()))))
-
-                                .orElse(div(new LoginForm().render(new LoginForm.State(),
-                                                               lfs -> auth.authenticate(lfs.userName, lfs.password)
-                                                                            .thenAccept(po -> po.ifPresentOrElse(p -> lfs.deviceId.ifPresent(id -> {
-                                                                                principals.put(id, p);
-                                                                                us.accept(us.get().withPrincipal(new Tuple2<>(lfs.deviceId.get(), p)));
-                                                                            }),
-                                                                                    () -> us.accept(us.get().withoutPrincipal()))))))
+                                div(of(resourceView(us))))).orElse(div(loginView(us)))
                     ));
+    }
+
+    private DocumentPartDefinition loginView(UseState<State> us) {
+        return new LoginForm().render(new LoginForm.State(),
+                                       lfs -> auth.authenticate(lfs.userName, lfs.password)
+                                                    .thenAccept(po -> po.ifPresentOrElse(p -> lfs.deviceId.ifPresent(id -> {
+                                                        principals.put(id, p);
+                                                        us.accept(us.get().withPrincipal(new Tuple2<>(lfs.deviceId.get(), p)));
+                                                    }),
+                                                            () -> us.accept(us.get().withoutPrincipal()))));
+    }
+
+    private Stream<DocumentPartDefinition> resourceView(UseState<State> us) {
+        return us.get().resourceState.flatMap(rs -> findResource(rs.name).map(p -> p.render(readWrite(() -> rs,
+                                                                                                    v -> us.accept(us.get().withResource(Optional.of(v))))))).stream();
     }
 
     private Optional<Resource> findResource(String resourceName) {
