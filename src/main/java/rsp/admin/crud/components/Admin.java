@@ -27,7 +27,7 @@ import static rsp.state.UseState.readWrite;
 
 public class Admin {
     private final String title;
-    private final List<Resource> resources;
+    private final List<Resource<?>> resources;
 
     private static final Map<String, Principal> principals = new ConcurrentHashMap<>();
 
@@ -46,7 +46,7 @@ public class Admin {
             public void beforeLivePageCreated(QualifiedSessionId sid, UseState<AppState> useState) {
                 pubSub.subscribe(sid.deviceId, sid.sessionId, message -> {
                     synchronized (useState) {
-                        useState.accept(useState.cast(State.class).get().withoutPrincipal());
+                        useState.accept(((State)useState.get()).withoutPrincipal());
                     }
                 });
             }
@@ -96,7 +96,7 @@ public class Admin {
         return resource.initialListStateWithEdit(key).thenApply(resourceState -> new State(principal, Optional.of(resourceState)));
     }
 
-    private Optional<Resource> resource(String name) {
+    private Optional<Resource<?>> resource(String name) {
         return resources.stream().filter(r -> name.equals(r.name)).findFirst();
     }
 
@@ -109,8 +109,10 @@ public class Admin {
     }
 
     private Path stateToPath(AppState appState, Path p) {
+
         if (appState instanceof State) {
             final var s = (State) appState;
+
             if (s.principal.isPresent()) {
                 return s.resourceState.map(state -> state.details.map(detailsViewState -> Path.of(state.name
                         + "/" + detailsViewState.currentKey.orElse("create")))
@@ -126,9 +128,9 @@ public class Admin {
     }
 
     private DocumentPartDefinition appRoot(UseState<AppState> us) {
-        if (us.isInstanceOf(State.class)) {
-            return appRootOk(us.cast(State.class));
-        } else if (us.isInstanceOf(NotFoundState.class)) {
+        if (us.get() instanceof State) {
+            return appRootOk((State) us.get(), us);
+        } else if (us.get() instanceof NotFoundState) {
             return appRootNotFound();
         } else {
             throw new IllegalStateException();
@@ -140,41 +142,57 @@ public class Admin {
                     body(h2("404"))).statusCode(404);
     }
 
-    private DocumentPartDefinition appRootOk(UseState<State> us) {
+    private DocumentPartDefinition appRootOk(State s, UseState<AppState> us) {
         return html(window().on("popstate",
                                 ctx ->
-            ctx.eventObject().value("path").flatMap(path -> paths(us.get().principal).apply(Path.of(path.toString())))
-                    .ifPresent(state -> state.thenAccept(s -> us.accept((State)s)))),
-                    head(title(title + us.get().resourceState.map(r -> ": " + r.title).orElse("")),
+            ctx.eventObject().value("path").flatMap(path -> paths(s.principal).apply(Path.of(path.toString())))
+                    .ifPresent(state -> state.thenAccept(v -> us.accept(v)))),
+                    head(title(title + s.resourceState.map(r -> ": " + r.title).orElse("")),
                          link(attr("rel", "stylesheet"), attr("href","/res/style.css"))),
-                    body(us.get().principal.map(u -> div(div(span(u._2.name),
+                    body(s.principal.map(u -> div(div(span(u._2.name),
                                                         a("#", "Logout", on("click", ctx -> {
                                                             principals.remove(ctx.sessionId().deviceId);
                                                             pubSub.publish(ctx.sessionId().deviceId, "logout");
-                                                            us.accept(us.get().withoutPrincipal());
+                                                            us.accept(s.withoutPrincipal());
                                                          }))),
                                                     new MenuPanel().render(new MenuPanel.State(resources.stream().map(r -> new Tuple2<>(r.name, r.title)).collect(Collectors.toList()))),
 
-                                div(of(resourceView(us))))).orElse(div(loginView(us)))
+                                div(of(resourceView(s, us))))).orElse(div(loginView(s, us)))
                     ));
     }
 
-    private DocumentPartDefinition loginView(UseState<State> us) {
+    private DocumentPartDefinition loginView(State s, UseState<AppState> us) {
         return new LoginForm().render(new LoginForm.State(),
                                        lfs -> auth.authenticate(lfs.userName, lfs.password)
                                                     .thenAccept(po -> po.ifPresentOrElse(p -> lfs.deviceId.ifPresent(id -> {
                                                         principals.put(id, p);
-                                                        us.accept(us.get().withPrincipal(new Tuple2<>(lfs.deviceId.get(), p)));
+                                                        us.accept(s.withPrincipal(new Tuple2<>(lfs.deviceId.get(), p)));
                                                     }),
-                                                            () -> us.accept(us.get().withoutPrincipal()))));
+                                                            () -> us.accept(s.withoutPrincipal()))));
     }
 
-    private Stream<DocumentPartDefinition> resourceView(UseState<State> us) {
-        return us.get().resourceState.flatMap(rs -> findResource(rs.name).map(p -> p.render(readWrite(() -> rs,
-                                                                                                    v -> us.accept(us.get().withResource(Optional.of(v))))))).stream();
+    private Stream<DocumentPartDefinition> resourceView(State s, UseState<AppState> us) {
+        return s.resourceState.flatMap(rs -> findResource(rs.name).map(p -> renderResourceView(s, p, rs, us))).stream();
     }
 
-    private Optional<Resource> findResource(String resourceName) {
+    private static DocumentPartDefinition renderResourceView(State s,
+                                                             Resource<?> resource,
+                                                             Resource.State<?> resourceState,
+                                                             UseState<AppState> appUseState) {
+        final UseState<Resource.State<?>> resourceUseState = readWrite(() -> resourceState,
+                                                                       v -> appUseState.accept(s.withResource(Optional.of(v))));
+        return renderResourceViewUnchecked(resource, resourceUseState);
+    }
+
+
+    private static DocumentPartDefinition renderResourceViewUnchecked(Resource resource,
+                                                                      UseState<Resource.State<?>> resourceUseState) {
+        @SuppressWarnings("unchecked")
+        final DocumentPartDefinition view = resource.render(resourceUseState);
+        return view;
+    }
+
+    private Optional<Resource<?>> findResource(String resourceName) {
         return resources.stream().filter(resource -> resource.name.equals(resourceName)).findFirst();
     }
 
