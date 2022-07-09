@@ -9,17 +9,17 @@ import java.util.*;
 
 import static rsp.html.HtmlDsl.*;
 
-public class DataGrid<T> implements Component<rsp.admin.crud.components.DataGrid.Table<String, T>> {
+public class ListView<T> implements Component<ListView.Table<String, T>> {
 
     private final List<Column<T>> columns;
 
     @SafeVarargs
-    public DataGrid(Column<T>... columns) {
+    public ListView(Column<T>... columns) {
         this.columns = Arrays.asList(columns);
     }
 
     @Override
-    public DocumentPartDefinition render(UseState<rsp.admin.crud.components.DataGrid.Table<String, T>> state) {
+    public DocumentPartDefinition render(UseState<ListView.Table<String, T>> state) {
         return div(
                 table(
                         thead(tr(th(""), of(columns.stream().map(h -> th(h.title))))),

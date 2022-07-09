@@ -9,10 +9,10 @@ import java.util.function.Function;
 
 import static rsp.html.HtmlDsl.*;
 
-public class Edit<T> implements Component<DetailsViewState<T>> {
+public class EditView<T> implements Component<DetailsViewState<T>> {
     private final Function<UseState<T>, Form> formFunction;
 
-    public Edit(Function<UseState<T>, Form> formFunction) {
+    public EditView(Function<UseState<T>, Form> formFunction) {
         this.formFunction = formFunction;
     }
 

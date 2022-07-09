@@ -27,14 +27,14 @@ import static rsp.state.UseState.readWrite;
 
 public class Admin {
     private final String title;
-    private final List<Resource<?>> resources;
+    private final List<ResourceView<?>> resources;
 
     private static final Map<String, Principal> principals = new ConcurrentHashMap<>();
 
     private final Auth auth = new Auth();
     private final PubSub pubSub = new PubSub();
 
-    public Admin(String title, Resource<?>... resources) {
+    public Admin(String title, ResourceView<?>... resources) {
         this.title = title;
         this.resources = Arrays.asList(resources);
     }
@@ -83,7 +83,7 @@ public class Admin {
                 .orElse(CompletableFuture.completedFuture(notFound()));
     }
 
-    private CompletableFuture<AppState> listState(Optional<Tuple2<String, Principal>> principal, Resource<?> resource) {
+    private CompletableFuture<AppState> listState(Optional<Tuple2<String, Principal>> principal, ResourceView<?> resource) {
         return resource.initialListState().thenApply(resourceState -> new State(principal, Optional.of(resourceState)));
     }
 
@@ -92,11 +92,11 @@ public class Admin {
                       .orElse(CompletableFuture.completedFuture(notFound()));
     }
 
-    private CompletableFuture<AppState> listStateWKey(Optional<Tuple2<String, Principal>> principal, Resource<?> resource, String key) {
+    private CompletableFuture<AppState> listStateWKey(Optional<Tuple2<String, Principal>> principal, ResourceView<?> resource, String key) {
         return resource.initialListStateWithEdit(key).thenApply(resourceState -> new State(principal, Optional.of(resourceState)));
     }
 
-    private Optional<Resource<?>> resource(String name) {
+    private Optional<ResourceView<?>> resource(String name) {
         return resources.stream().filter(r -> name.equals(r.name)).findFirst();
     }
 
@@ -176,23 +176,23 @@ public class Admin {
     }
 
     private static DocumentPartDefinition renderResourceView(State s,
-                                                             Resource<?> resource,
-                                                             Resource.State<?> resourceState,
+                                                             ResourceView<?> resource,
+                                                             ResourceView.State<?> resourceState,
                                                              UseState<AppState> appUseState) {
-        final UseState<Resource.State<?>> resourceUseState = readWrite(() -> resourceState,
+        final UseState<ResourceView.State<?>> resourceUseState = readWrite(() -> resourceState,
                                                                        v -> appUseState.accept(s.withResource(Optional.of(v))));
         return renderResourceViewUnchecked(resource, resourceUseState);
     }
 
 
-    private static DocumentPartDefinition renderResourceViewUnchecked(Resource resource,
-                                                                      UseState<Resource.State<?>> resourceUseState) {
+    private static DocumentPartDefinition renderResourceViewUnchecked(ResourceView resource,
+                                                                      UseState<ResourceView.State<?>> resourceUseState) {
         @SuppressWarnings("unchecked")
         final DocumentPartDefinition view = resource.render(resourceUseState);
         return view;
     }
 
-    private Optional<Resource<?>> findResource(String resourceName) {
+    private Optional<ResourceView<?>> findResource(String resourceName) {
         return resources.stream().filter(resource -> resource.name.equals(resourceName)).findFirst();
     }
 
@@ -207,14 +207,14 @@ public class Admin {
 
     public static class State implements AppState {
         public final Optional<Tuple2<String, Principal>> principal;
-        public final Optional<Resource.State<?>> resourceState;
+        public final Optional<ResourceView.State<?>> resourceState;
 
-        public State(Optional<Tuple2<String, Principal>> principal, Optional<Resource.State<?>> resourceState) {
+        public State(Optional<Tuple2<String, Principal>> principal, Optional<ResourceView.State<?>> resourceState) {
             this.principal = principal;
             this.resourceState = resourceState;
         }
 
-        public State withResource(Optional<Resource.State<?>> currentResource) {
+        public State withResource(Optional<ResourceView.State<?>> currentResource) {
             return new State(this.principal, currentResource);
         }
 

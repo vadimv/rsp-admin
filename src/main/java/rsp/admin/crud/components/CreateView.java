@@ -12,10 +12,10 @@ import static rsp.html.HtmlDsl.div;
 import static rsp.html.HtmlDsl.span;
 import static rsp.state.UseState.readWrite;
 
-public class Create<T> implements Component<DetailsViewState<T>> {
+public class CreateView<T> implements Component<DetailsViewState<T>> {
     private final Function<Consumer<T>, Form> formFunction;
 
-    public Create(Function<Consumer<T>, Form> formFunction) {
+    public CreateView(Function<Consumer<T>, Form> formFunction) {
         this.formFunction = formFunction;
     }
 
