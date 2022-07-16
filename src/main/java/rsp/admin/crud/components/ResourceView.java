@@ -1,7 +1,7 @@
 package rsp.admin.crud.components;
 
 import rsp.Component;
-import rsp.admin.crud.entities.KeyedEntity;
+import rsp.admin.data.KeyedEntity;
 import rsp.admin.crud.services.EntityService;
 import rsp.html.DocumentPartDefinition;
 import rsp.state.UseState;
@@ -24,16 +24,16 @@ public class ResourceView<T> implements Component<ResourceView.State<T>> {
     public final String title;
     public final EntityService<String, T> entityService;
 
-    private final ListView<T> listComponent;
-    private final Optional<EditView<T>> editComponent;
-    private final Optional<CreateView<T>> createComponent;
+    private final Component<ListView.Table<String, T>> listComponent;
+    private final Optional<Component<DetailsViewState<T>>> editComponent;
+    private final Optional<Component<DetailsViewState<T>>> createComponent;
 
     public ResourceView(String name,
                         String title,
                         EntityService<String, T> entityService,
-                        ListView<T> listComponent,
-                        EditView<T> editComponent,
-                        CreateView<T> createComponent) {
+                        Component<ListView.Table<String, T>> listComponent,
+                        Component<DetailsViewState<T>> editComponent,
+                        Component<DetailsViewState<T>> createComponent) {
         this.name = name;
         this.title = title;
         this.entityService = entityService;

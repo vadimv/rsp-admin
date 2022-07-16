@@ -1,6 +1,6 @@
 package rsp.admin.crud.services;
 
-import rsp.admin.crud.entities.KeyedEntity;
+import rsp.admin.data.KeyedEntity;
 
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;

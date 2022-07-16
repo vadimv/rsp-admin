@@ -1,7 +1,6 @@
 package rsp.admin.crud.entities;
 
-import rsp.admin.crud.entities.Author;
-import rsp.admin.crud.entities.KeyedEntity;
+import rsp.admin.data.KeyedEntity;
 
 import java.util.HashSet;
 import java.util.Set;

@@ -1,4 +1,4 @@
-package rsp.admin.crud.entities;
+package rsp.admin.data;
 
 import rsp.util.data.Tuple2;
 
@@ -16,8 +16,8 @@ public class KeyedEntity<K, T> {
         this.data = data;
     }
 
-    public rsp.admin.crud.entities.KeyedEntity<K, T> update(T updatedData) {
-        return new rsp.admin.crud.entities.KeyedEntity<>(key, updatedData);
+    public KeyedEntity<K, T> update(T updatedData) {
+        return new KeyedEntity<>(key, updatedData);
     }
 
     public String[] dataFieldsNames() {

@@ -2,8 +2,7 @@ package rsp.admin.crud.services;
 
 import rsp.admin.crud.entities.Author;
 import rsp.admin.crud.entities.Book;
-import rsp.admin.crud.entities.KeyedEntity;
-import rsp.admin.crud.services.EntityService;
+import rsp.admin.data.KeyedEntity;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;

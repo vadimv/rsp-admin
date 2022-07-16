@@ -1,7 +1,7 @@
 package rsp.admin.crud.components;
 
 import rsp.Component;
-import rsp.admin.crud.entities.KeyedEntity;
+import rsp.admin.data.KeyedEntity;
 import rsp.html.DocumentPartDefinition;
 import rsp.state.UseState;
 
