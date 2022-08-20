@@ -1,4 +1,4 @@
-package rsp.admin.crud.entities;
+package rsp.admin.samples.authorsbooks;
 
 public class Name {
     public final String firstName;
@@ -9,9 +9,9 @@ public class Name {
         this.secondName = secondName;
     }
 
-    public static rsp.admin.crud.entities.Name of(String str) {
+    public static Name of(String str) {
         final String[] tokens = str.split(" ");
-        return new rsp.admin.crud.entities.Name(tokens[0], tokens.length > 1 ? tokens[1] : "");
+        return new Name(tokens[0], tokens.length > 1 ? tokens[1] : "");
     }
 
     @Override

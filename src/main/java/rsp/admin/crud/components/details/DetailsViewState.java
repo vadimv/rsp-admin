@@ -1,4 +1,4 @@
-package rsp.admin.crud.components;
+package rsp.admin.crud.components.details;
 
 import java.util.Collections;
 import java.util.Map;
@@ -23,15 +23,15 @@ public class DetailsViewState<T> {
         this(Optional.empty(), Optional.empty(), Collections.emptyMap());
     }
 
-    public rsp.admin.crud.components.DetailsViewState<T> show() {
-        return new rsp.admin.crud.components.DetailsViewState<>(this.currentValue, this.currentKey, this.validationErrors);
+    public DetailsViewState<T> show() {
+        return new DetailsViewState<>(this.currentValue, this.currentKey, this.validationErrors);
     }
 
-    public rsp.admin.crud.components.DetailsViewState<T> withValue(T value) {
-        return new rsp.admin.crud.components.DetailsViewState<>(Optional.of(value), this.currentKey, this.validationErrors);
+    public DetailsViewState<T> withValue(T value) {
+        return new DetailsViewState<>(Optional.of(value), this.currentKey, this.validationErrors);
     }
 
-    public rsp.admin.crud.components.DetailsViewState<T> withValidationErrors(Map<String, String> validationErrors) {
-        return new rsp.admin.crud.components.DetailsViewState<>(this.currentValue, this.currentKey, validationErrors);
+    public DetailsViewState<T> withValidationErrors(Map<String, String> validationErrors) {
+        return new DetailsViewState<>(this.currentValue, this.currentKey, validationErrors);
     }
 }

@@ -1,4 +1,4 @@
-package rsp.admin.crud.components;
+package rsp.admin.crud.components.list;
 
 import rsp.Component;
 import rsp.html.DocumentPartDefinition;
@@ -8,8 +8,7 @@ import static rsp.html.HtmlDsl.a;
 import static rsp.html.HtmlDsl.on;
 
 public class EditButton implements Component<String> {
-
-
+    
     public EditButton() {
     }
 

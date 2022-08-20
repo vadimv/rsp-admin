@@ -1,4 +1,4 @@
-package rsp.admin.crud.entities;
+package rsp.admin.samples.authorsbooks;
 
 import rsp.admin.data.KeyedEntity;
 
@@ -16,9 +16,9 @@ public class Book {
         this.authors = authors;
     }
 
-    public rsp.admin.crud.entities.Book addAuthor(KeyedEntity<String, Author> author) {
+    public Book addAuthor(KeyedEntity<String, Author> author) {
         final var a = new HashSet<>(authors);
         a.add(author);
-        return new rsp.admin.crud.entities.Book(title, description, a);
+        return new Book(title, description, a);
     }
 }

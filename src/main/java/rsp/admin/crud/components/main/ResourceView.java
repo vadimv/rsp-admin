@@ -1,6 +1,8 @@
-package rsp.admin.crud.components;
+package rsp.admin.crud.components.main;
 
 import rsp.Component;
+import rsp.admin.crud.components.details.DetailsViewState;
+import rsp.admin.crud.components.list.ListView;
 import rsp.admin.data.KeyedEntity;
 import rsp.admin.crud.services.EntityService;
 import rsp.html.DocumentPartDefinition;

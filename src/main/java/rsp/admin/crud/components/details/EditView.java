@@ -1,4 +1,4 @@
-package rsp.admin.crud.components;
+package rsp.admin.crud.components.details;
 
 import rsp.Component;
 import rsp.html.DocumentPartDefinition;

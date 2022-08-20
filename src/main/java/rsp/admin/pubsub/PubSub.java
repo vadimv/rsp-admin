@@ -1,4 +1,4 @@
-package rsp.admin.crud.components;
+package rsp.admin.pubsub;
 
 
 import rsp.util.data.Tuple2;

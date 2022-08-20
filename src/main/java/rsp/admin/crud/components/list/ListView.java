@@ -1,4 +1,4 @@
-package rsp.admin.crud.components;
+package rsp.admin.crud.components.list;
 
 import rsp.Component;
 import rsp.admin.data.KeyedEntity;

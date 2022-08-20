@@ -1,6 +1,7 @@
-package rsp.admin.crud.components;
+package rsp.admin.crud.components.details;
 
 import rsp.Component;
+import rsp.admin.crud.components.text.TextInput;
 import rsp.html.DocumentPartDefinition;
 import rsp.state.UseState;
 import rsp.util.data.Tuple2;
@@ -13,7 +14,7 @@ import java.util.stream.Collectors;
 
 import static rsp.html.HtmlDsl.*;
 
-public class Form implements Component<rsp.admin.crud.components.Form.State> {
+public class Form implements Component<Form.State> {
 
     private final Consumer<Function<String, Optional<String>>> submittedData;
     private final List<TextInput> fieldsComponents;
@@ -25,7 +26,7 @@ public class Form implements Component<rsp.admin.crud.components.Form.State> {
 
 
     @Override
-    public DocumentPartDefinition render(UseState<rsp.admin.crud.components.Form.State> useState) {
+    public DocumentPartDefinition render(UseState<Form.State> useState) {
         return
             div(form(on("submit", c -> {
                         // Validate all fieldComponents, if any is invalid update state with validation messages, if all valid accept the values
@@ -39,7 +40,7 @@ public class Form implements Component<rsp.admin.crud.components.Form.State> {
                                         .collect(Collectors.toMap(t -> t._1, t -> t._2.get(0)));
 
                             if (topValidationErrors.size() > 0) {
-                                useState.accept(new rsp.admin.crud.components.Form.State(topValidationErrors));
+                                useState.accept(new Form.State(topValidationErrors));
                             } else {
                                 submittedData.accept(name -> c.eventObject().value(name).map(v -> {
                                     assert v instanceof JsonDataType.String;

@@ -1,6 +1,7 @@
-package rsp.admin.crud.components;
+package rsp.admin.crud.components.main;
 
 import rsp.Component;
+import rsp.admin.crud.components.text.TextInput;
 import rsp.html.DocumentPartDefinition;
 import rsp.state.UseState;
 
@@ -8,7 +9,7 @@ import java.util.Optional;
 
 import static rsp.html.HtmlDsl.*;
 
-public class LoginForm implements Component<rsp.admin.crud.components.LoginForm.State> {
+public class LoginForm implements Component<LoginForm.State> {
 
     @Override
     public DocumentPartDefinition render(UseState<State> us) {

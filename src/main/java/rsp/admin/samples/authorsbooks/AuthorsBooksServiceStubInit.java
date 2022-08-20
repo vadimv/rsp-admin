@@ -1,4 +1,4 @@
-package rsp.admin.crud.entities;
+package rsp.admin.samples.authorsbooks;
 
 import rsp.admin.data.KeyedEntity;
 import rsp.admin.crud.services.EntityService;

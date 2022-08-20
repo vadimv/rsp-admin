@@ -1,11 +1,17 @@
-package rsp.admin;
+package rsp.admin.samples.authorsbooks;
 
-import rsp.admin.crud.components.*;
-import rsp.admin.crud.entities.Author;
-import rsp.admin.crud.entities.AuthorsBooksServiceStubInit;
-import rsp.admin.crud.entities.Book;
+import rsp.admin.Admin;
+import rsp.admin.crud.components.details.CreateView;
+import rsp.admin.crud.components.details.EditView;
+import rsp.admin.crud.components.details.Form;
+import rsp.admin.crud.components.list.Column;
+import rsp.admin.crud.components.list.EditButton;
+import rsp.admin.crud.components.list.ListView;
+import rsp.admin.crud.components.list.TextField;
+import rsp.admin.crud.components.main.ResourceView;
+import rsp.admin.crud.components.text.RequiredValidation;
+import rsp.admin.crud.components.text.TextInput;
 import rsp.admin.crud.services.EntityService;
-import rsp.admin.crud.services.SimpleDb;
 import rsp.jetty.JettyServer;
 import rsp.server.StaticResources;
 

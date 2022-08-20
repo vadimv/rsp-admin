@@ -1,4 +1,4 @@
-package rsp.admin.crud.entities;
+package rsp.admin.samples.authorsbooks;
 
 import rsp.admin.data.KeyedEntity;
 
@@ -18,18 +18,18 @@ public class Author {
         this(name, Set.of());
     }
 
-    public static rsp.admin.crud.entities.Author of(String name) {
-        return new rsp.admin.crud.entities.Author(Name.of(name));
+    public static Author of(String name) {
+        return new Author(Name.of(name));
     }
     @Override
     public String toString() {
         return name.toString();
     }
 
-    public rsp.admin.crud.entities.Author addBook(KeyedEntity<String, Book> book) {
+    public Author addBook(KeyedEntity<String, Book> book) {
         final var b = new HashSet<>(books);
         b.add(book);
-        return new rsp.admin.crud.entities.Author(name, b);
+        return new Author(name, b);
     }
 
 }

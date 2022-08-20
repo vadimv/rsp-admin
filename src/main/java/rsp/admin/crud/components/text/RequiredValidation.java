@@ -1,4 +1,4 @@
-package rsp.admin.crud.components;
+package rsp.admin.crud.components.text;
 
 import java.util.Optional;
 import java.util.function.Function;

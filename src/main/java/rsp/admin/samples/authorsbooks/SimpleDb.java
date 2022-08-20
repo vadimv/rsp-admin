@@ -1,7 +1,6 @@
-package rsp.admin.crud.services;
+package rsp.admin.samples.authorsbooks;
 
-import rsp.admin.crud.entities.Author;
-import rsp.admin.crud.entities.Book;
+import rsp.admin.crud.services.EntityService;
 import rsp.admin.data.KeyedEntity;
 
 import java.util.*;

@@ -1,4 +1,4 @@
-package rsp.admin.crud.components;
+package rsp.admin.crud.components.text;
 
 import rsp.Component;
 import rsp.html.DocumentPartDefinition;
@@ -24,7 +24,7 @@ public class TextInput implements Component<Optional<String>> {
 
     @SafeVarargs
     public TextInput(String fieldName,
-                     rsp.admin.crud.components.TextInput.Type type,
+                     TextInput.Type type,
                      String labelText,
                      String initialValue,
                      Function<String, Optional<String>>... validations) {

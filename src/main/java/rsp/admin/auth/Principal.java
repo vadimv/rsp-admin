@@ -1,4 +1,4 @@
-package rsp.admin.crud.entities;
+package rsp.admin.auth;
 
 public class Principal {
     public final String name;

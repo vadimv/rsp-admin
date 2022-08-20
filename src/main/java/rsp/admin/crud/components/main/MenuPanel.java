@@ -1,4 +1,4 @@
-package rsp.admin.crud.components;
+package rsp.admin.crud.components.main;
 
 import rsp.Component;
 import rsp.html.DocumentPartDefinition;
@@ -9,7 +9,7 @@ import java.util.List;
 
 import static rsp.html.HtmlDsl.*;
 
-public class MenuPanel implements Component<rsp.admin.crud.components.MenuPanel.State> {
+public class MenuPanel implements Component<MenuPanel.State> {
 
     @Override
     public DocumentPartDefinition render(UseState<State> state) {
