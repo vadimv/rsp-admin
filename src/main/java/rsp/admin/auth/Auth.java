@@ -1,7 +1,5 @@
 package rsp.admin.auth;
 
-import rsp.admin.auth.Principal;
-
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 

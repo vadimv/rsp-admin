@@ -1,17 +1,17 @@
 package rsp.admin.samples.authorsbooks;
 
 import rsp.admin.Admin;
-import rsp.admin.crud.components.details.CreateView;
-import rsp.admin.crud.components.details.EditView;
-import rsp.admin.crud.components.details.Form;
-import rsp.admin.crud.components.list.Column;
-import rsp.admin.crud.components.list.EditButton;
-import rsp.admin.crud.components.list.ListView;
-import rsp.admin.crud.components.list.TextField;
-import rsp.admin.crud.components.main.ResourceView;
-import rsp.admin.crud.components.text.RequiredValidation;
-import rsp.admin.crud.components.text.TextInput;
-import rsp.admin.crud.services.EntityService;
+import rsp.admin.components.details.CreateView;
+import rsp.admin.components.details.EditView;
+import rsp.admin.components.details.Form;
+import rsp.admin.components.list.Column;
+import rsp.admin.components.list.EditButton;
+import rsp.admin.components.list.ListView;
+import rsp.admin.components.list.TextField;
+import rsp.admin.components.main.ResourceView;
+import rsp.admin.components.text.RequiredValidation;
+import rsp.admin.components.text.TextInput;
+import rsp.admin.data.provider.EntityService;
 import rsp.jetty.JettyServer;
 import rsp.server.StaticResources;
 

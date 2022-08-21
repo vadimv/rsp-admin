@@ -1,6 +1,6 @@
 package rsp.admin.samples.authorsbooks;
 
-import rsp.admin.data.KeyedEntity;
+import rsp.admin.data.entity.KeyedEntity;
 
 import java.util.HashSet;
 import java.util.Set;

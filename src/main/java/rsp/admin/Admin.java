@@ -2,7 +2,8 @@ package rsp.admin;
 
 import rsp.App;
 import rsp.admin.auth.Auth;
-import rsp.admin.crud.components.main.*;
+import rsp.admin.components.main.*;
+import rsp.admin.pubsub.DefaultPubSub;
 import rsp.admin.pubsub.PubSub;
 
 import java.util.Arrays;
@@ -12,7 +13,7 @@ public final class Admin {
     private final String title;
     private final List<ResourceView<?>> resources;
     private final Auth auth = new Auth();
-    private final PubSub pubSub = new PubSub();
+    private final PubSub pubSub = new DefaultPubSub();
 
     public Admin(String title, ResourceView<?>... resources) {
         this.title = title;

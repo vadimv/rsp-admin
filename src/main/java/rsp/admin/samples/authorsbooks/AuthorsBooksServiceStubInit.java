@@ -1,7 +1,7 @@
 package rsp.admin.samples.authorsbooks;
 
-import rsp.admin.data.KeyedEntity;
-import rsp.admin.crud.services.EntityService;
+import rsp.admin.data.entity.KeyedEntity;
+import rsp.admin.data.provider.EntityService;
 import rsp.util.StreamUtils;
 import rsp.util.data.Tuple2;
 
