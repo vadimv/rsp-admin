@@ -11,7 +11,7 @@ import java.util.function.Function;
 
 import static rsp.html.HtmlDsl.*;
 
-public class TextInput implements Component<Optional<String>> {
+public final class TextInput implements Component<Optional<String>> {
     public enum Type {
         TEXT, PASSWORD
     }

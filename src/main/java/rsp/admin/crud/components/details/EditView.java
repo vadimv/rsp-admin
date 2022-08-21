@@ -9,7 +9,8 @@ import java.util.function.Function;
 
 import static rsp.html.HtmlDsl.*;
 
-public class EditView<T> implements Component<DetailsViewState<T>> {
+public final class EditView<T> implements Component<DetailsViewState<T>> {
+
     private final Function<UseState<T>, Form> formFunction;
 
     public EditView(Function<UseState<T>, Form> formFunction) {

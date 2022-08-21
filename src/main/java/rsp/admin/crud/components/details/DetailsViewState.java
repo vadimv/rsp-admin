@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 
-public class DetailsViewState<T> {
+public final class DetailsViewState<T> {
     public final Optional<T> currentValue;
     public final Optional<String> currentKey;
     public final Map<String, String> validationErrors;

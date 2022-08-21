@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 
 import static rsp.html.HtmlDsl.*;
 
-public class Form implements Component<Form.State> {
+public final class Form implements Component<Form.State> {
 
     private final Consumer<Function<String, Optional<String>>> submittedData;
     private final List<TextInput> fieldsComponents;

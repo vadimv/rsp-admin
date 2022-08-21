@@ -9,7 +9,7 @@ import java.util.*;
 
 import static rsp.html.HtmlDsl.*;
 
-public class ListView<T> implements Component<ListView.Table<String, T>> {
+public final class ListView<T> implements Component<ListView.ListViewState<String, T>> {
 
     private final List<Column<T>> columns;
 
@@ -19,7 +19,7 @@ public class ListView<T> implements Component<ListView.Table<String, T>> {
     }
 
     @Override
-    public DocumentPartDefinition render(UseState<ListView.Table<String, T>> state) {
+    public DocumentPartDefinition render(UseState<ListViewState<String, T>> state) {
         return div(
                 table(
                         thead(tr(th(""), of(columns.stream().map(h -> th(h.title))))),
@@ -35,39 +35,39 @@ public class ListView<T> implements Component<ListView.Table<String, T>> {
                 );
     }
 
-    public static class Table<K, T> {
+    public static final class ListViewState<K, T> {
         public final List<KeyedEntity<K, T>> rows;
         public final Set<KeyedEntity<K, T>> selectedRows;
         public final Optional<String> editRowKey;
 
-        public Table(List<KeyedEntity<K, T>> rows, Set<KeyedEntity<K, T>> selectedRows, Optional<String> editRowKey) {
+        public ListViewState(List<KeyedEntity<K, T>> rows, Set<KeyedEntity<K, T>> selectedRows, Optional<String> editRowKey) {
             this.rows = Objects.requireNonNull(rows);
             this.selectedRows = Objects.requireNonNull(selectedRows);
             this.editRowKey = editRowKey;
         }
 
-        public Table(List<KeyedEntity<K, T>> rows, Set<KeyedEntity<K, T>> selectedRows) {
+        public ListViewState(List<KeyedEntity<K, T>> rows, Set<KeyedEntity<K, T>> selectedRows) {
             this.rows = Objects.requireNonNull(rows);
             this.selectedRows = Objects.requireNonNull(selectedRows);
             this.editRowKey = Optional.empty();
         }
 
-        public static <K, T> Table<K, T> empty() {
-            return new Table<>(List.of(), Set.of());
+        public static <K, T> ListViewState<K, T> empty() {
+            return new ListViewState<>(List.of(), Set.of());
         }
 
-        public Table<K, T> toggleRowSelection(KeyedEntity<K, T> row) {
+        public ListViewState<K, T> toggleRowSelection(KeyedEntity<K, T> row) {
             final Set<KeyedEntity<K, T>> sr = new HashSet<>(selectedRows);
             if (selectedRows.contains(row)) {
                 sr.remove(row);
             } else {
                 sr.add(row);
             }
-            return new Table<>(rows, sr);
+            return new ListViewState<>(rows, sr);
         }
 
-        public Table<K, T> withEditRowKey(Optional<String> rowKey) {
-            return new Table<>(this.rows, this.selectedRows, rowKey);
+        public ListViewState<K, T> withEditRowKey(Optional<String> rowKey) {
+            return new ListViewState<>(this.rows, this.selectedRows, rowKey);
         }
     }
 }

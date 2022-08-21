@@ -4,7 +4,7 @@ import java.util.Optional;
 import java.util.function.Function;
 
 
-public class RequiredValidation implements Function<String, Optional<String>> {
+public final class RequiredValidation implements Function<String, Optional<String>> {
 
     @Override
     public Optional<String> apply(String s) {

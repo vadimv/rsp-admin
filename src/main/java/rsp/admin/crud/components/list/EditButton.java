@@ -7,8 +7,8 @@ import rsp.state.UseState;
 import static rsp.html.HtmlDsl.a;
 import static rsp.html.HtmlDsl.on;
 
-public class EditButton implements Component<String> {
-    
+public final class EditButton implements Component<String> {
+
     public EditButton() {
     }
 

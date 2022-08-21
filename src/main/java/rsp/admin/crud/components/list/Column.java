@@ -4,7 +4,7 @@ import rsp.Component;
 
 import java.util.function.Function;
 
-public class Column<T> {
+public final class Column<T> {
     public final String title;
     public final Function<T, Component<String>> fieldComponent;
 

@@ -26,14 +26,14 @@ public class ResourceView<T> implements Component<ResourceView.State<T>> {
     public final String title;
     public final EntityService<String, T> entityService;
 
-    private final Component<ListView.Table<String, T>> listComponent;
+    private final Component<ListView.ListViewState<String, T>> listComponent;
     private final Optional<Component<DetailsViewState<T>>> editComponent;
     private final Optional<Component<DetailsViewState<T>>> createComponent;
 
     public ResourceView(String name,
                         String title,
                         EntityService<String, T> entityService,
-                        Component<ListView.Table<String, T>> listComponent,
+                        Component<ListView.ListViewState<String, T>> listComponent,
                         Component<DetailsViewState<T>> editComponent,
                         Component<DetailsViewState<T>> createComponent) {
         this.name = name;
@@ -46,13 +46,13 @@ public class ResourceView<T> implements Component<ResourceView.State<T>> {
 
     public CompletableFuture<ResourceView.State<T>> initialListState() {
         return entityService.getList(0, DEFAULT_PAGE_SIZE)
-                .thenApply(entities -> new ListView.Table<>(entities, new HashSet<>()))
+                .thenApply(entities -> new ListView.ListViewState<>(entities, new HashSet<>()))
                 .thenApply(gridState -> new ResourceView.State<>(name, title, gridState, Optional.empty()));
     }
 
     public CompletableFuture<ResourceView.State<T>> initialListStateWithEdit(String key) {
             return entityService.getList(0, DEFAULT_PAGE_SIZE)
-                .thenApply(entities -> new ListView.Table<>(entities, new HashSet<>()))
+                .thenApply(entities -> new ListView.ListViewState<>(entities, new HashSet<>()))
                 .thenCombine(entityService.getOne(key).thenApply(keo -> new DetailsViewState<>(keo.map(ke -> ke.data),
                                                                                              keo.map(ke -> ke.key))),
                         (gridState, edit) ->  new ResourceView.State<>(name, title, gridState, Optional.of(edit)));
@@ -73,7 +73,7 @@ public class ResourceView<T> implements Component<ResourceView.State<T>> {
                                     StreamUtils.sequence(rows.stream().map(r -> entityService.delete(r.key))
                                                .collect(Collectors.toList()))
                                                .thenAccept(l -> entityService.getList(0, DEFAULT_PAGE_SIZE)
-                                                                             .thenAccept(entities -> us.accept(us.get().withList(new ListView.Table<>(entities,
+                                                                             .thenAccept(entities -> us.accept(us.get().withList(new ListView.ListViewState<>(entities,
                                                                                                                                                       new HashSet<>())))));
                                 }))),
                     listComponent.render(us.get().list,
@@ -100,14 +100,14 @@ public class ResourceView<T> implements Component<ResourceView.State<T>> {
                 entityService.update(new KeyedEntity<>(editState.currentKey.get(), editState.currentValue.get()))
                         .thenCompose(u -> entityService.getList(0, DEFAULT_PAGE_SIZE))
                         .thenAccept(entities ->
-                                us.accept(us.get().withList(new ListView.Table<>(entities, new HashSet<>())))).join();
+                                us.accept(us.get().withList(new ListView.ListViewState<>(entities, new HashSet<>())))).join();
 
             } else if (editState.currentValue.isPresent()) {
                 // create
                 entityService.create(editState.currentValue.get())
                         .thenCompose(u -> entityService.getList(0, DEFAULT_PAGE_SIZE))
                         .thenAccept(entities ->
-                                us.accept(us.get().withList(new ListView.Table<>(entities,
+                                us.accept(us.get().withList(new ListView.ListViewState<>(entities,
                                         new HashSet<>())))).join();
             } else {
                 us.accept(us.get().hideDetails());
@@ -118,12 +118,12 @@ public class ResourceView<T> implements Component<ResourceView.State<T>> {
     public static class State<T> {
         public final String name;
         public final String title;
-        public final ListView.Table<String, T> list;
+        public final ListView.ListViewState<String, T> list;
         public final Optional<DetailsViewState<T>> details; //TODO to Optional<DetailsViewState<T>> , verify DetailsViewState.isActive
 
         public State(String name,
                      String title,
-                     ListView.Table<String, T> list,
+                     ListView.ListViewState<String, T> list,
                      Optional<DetailsViewState<T>> details) {
             this.name = name;
             this.title = title;
@@ -131,7 +131,7 @@ public class ResourceView<T> implements Component<ResourceView.State<T>> {
             this.details = details;
         }
 
-        public State<T> withList(ListView.Table<String, T> gs) {
+        public State<T> withList(ListView.ListViewState<String, T> gs) {
             return new State<T>(name, title, gs, Optional.empty());
         }
 
