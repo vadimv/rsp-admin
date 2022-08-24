@@ -2,6 +2,7 @@ package rsp.admin.samples.authorsbooks;
 
 import rsp.admin.data.provider.EntityService;
 import rsp.admin.data.entity.KeyedEntity;
+import rsp.admin.data.provider.GetListQuery;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -32,9 +33,9 @@ public class SimpleDb {
         }
 
         @Override
-        public CompletableFuture<List<KeyedEntity<String, Author>>> getList(int offset, int limit) {
+        public CompletableFuture<List<KeyedEntity<String, Author>>> getList(GetListQuery<String> query) {
             return CompletableFuture.completedFuture(new ArrayList<>(authors.entrySet().stream().map(e ->
-                    new KeyedEntity<>(e.getKey(), e.getValue())).collect(Collectors.toList())));
+                                                     new KeyedEntity<>(e.getKey(), e.getValue())).collect(Collectors.toList())));
         }
 
         @Override
@@ -71,6 +72,8 @@ public class SimpleDb {
                 return CompletableFuture.completedFuture(Optional.of(updatedKeyedEntity));
             }
         }
+
+
     }
 
     public class SimpleBooksEntityService implements EntityService<String, Book> {
@@ -81,7 +84,7 @@ public class SimpleDb {
         }
 
         @Override
-        public CompletableFuture<List<KeyedEntity<String, Book>>> getList(int offset, int limit) {
+        public CompletableFuture<List<KeyedEntity<String, Book>>> getList(GetListQuery<String> query) {
             return CompletableFuture.completedFuture(new ArrayList<>(books.entrySet().stream().map(e ->
                     new KeyedEntity<>(e.getKey(), e.getValue())).collect(Collectors.toList())));
         }

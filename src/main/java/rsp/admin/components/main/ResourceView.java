@@ -5,6 +5,8 @@ import rsp.admin.components.details.DetailsViewState;
 import rsp.admin.components.list.ListView;
 import rsp.admin.data.entity.KeyedEntity;
 import rsp.admin.data.provider.EntityService;
+import rsp.admin.data.provider.GetListQuery;
+import rsp.admin.data.provider.Pagination;
 import rsp.html.DocumentPartDefinition;
 import rsp.state.UseState;
 import rsp.util.StreamUtils;
@@ -44,24 +46,24 @@ public class ResourceView<T> implements Component<ResourceView.State<T>> {
         this.createComponent = Optional.of(createComponent);
     }
 
-    public CompletableFuture<ResourceView.State<T>> initialListState() {
-        return entityService.getList(0, DEFAULT_PAGE_SIZE)
+    public CompletableFuture<State<T>> initialListState() {
+        return entityService.getList(GetListQuery.empty(String.class).withPagination(new Pagination(0, DEFAULT_PAGE_SIZE)))
                 .thenApply(entities -> new ListView.ListViewState<>(entities, new HashSet<>()))
-                .thenApply(gridState -> new ResourceView.State<>(name, title, gridState, Optional.empty()));
+                .thenApply(gridState -> new State<>(name, title, gridState, Optional.empty()));
     }
 
-    public CompletableFuture<ResourceView.State<T>> initialListStateWithEdit(String key) {
-            return entityService.getList(0, DEFAULT_PAGE_SIZE)
+    public CompletableFuture<State<T>> initialListStateWithEdit(String key) {
+            return entityService.getList(GetListQuery.empty(String.class).withPagination(new Pagination(0, DEFAULT_PAGE_SIZE)))
                 .thenApply(entities -> new ListView.ListViewState<>(entities, new HashSet<>()))
                 .thenCombine(entityService.getOne(key).thenApply(keo -> new DetailsViewState<>(keo.map(ke -> ke.data),
-                                                                                             keo.map(ke -> ke.key))),
-                        (gridState, edit) ->  new ResourceView.State<>(name, title, gridState, Optional.of(edit)));
+                                                                                               keo.map(ke -> ke.key))),
+                        (gridState, edit) ->  new State<>(name, title, gridState, Optional.of(edit)));
     }
 
 
 
     @Override
-    public DocumentPartDefinition render(UseState<ResourceView.State<T>> us) {
+    public DocumentPartDefinition render(UseState<State<T>> us) {
         return div(div(when(createComponent.isPresent(), button(attr("type", "button"),
                                                                 text("Create"),
                                                                 on("click", ctx -> us.accept(us.get().withCreate())))),
@@ -72,7 +74,7 @@ public class ResourceView<T> implements Component<ResourceView.State<T>> {
                                     final Set<KeyedEntity<String, T>> rows = us.get().list.selectedRows;
                                     StreamUtils.sequence(rows.stream().map(r -> entityService.delete(r.key))
                                                .collect(Collectors.toList()))
-                                               .thenAccept(l -> entityService.getList(0, DEFAULT_PAGE_SIZE)
+                                               .thenAccept(l -> entityService.getList(GetListQuery.empty(String.class).withPagination(new Pagination(0, DEFAULT_PAGE_SIZE)))
                                                                              .thenAccept(entities -> us.accept(us.get().withList(new ListView.ListViewState<>(entities,
                                                                                                                                                       new HashSet<>())))));
                                 }))),
@@ -98,14 +100,14 @@ public class ResourceView<T> implements Component<ResourceView.State<T>> {
             } else if (editState.currentValue.isPresent() && editState.currentKey.isPresent()) {
                 // edit
                 entityService.update(new KeyedEntity<>(editState.currentKey.get(), editState.currentValue.get()))
-                        .thenCompose(u -> entityService.getList(0, DEFAULT_PAGE_SIZE))
+                        .thenCompose(u -> entityService.getList(GetListQuery.empty(String.class).withPagination(new Pagination(0, DEFAULT_PAGE_SIZE))))
                         .thenAccept(entities ->
                                 us.accept(us.get().withList(new ListView.ListViewState<>(entities, new HashSet<>())))).join();
 
             } else if (editState.currentValue.isPresent()) {
                 // create
                 entityService.create(editState.currentValue.get())
-                        .thenCompose(u -> entityService.getList(0, DEFAULT_PAGE_SIZE))
+                        .thenCompose(u -> entityService.getList(GetListQuery.empty(String.class).withPagination(new Pagination(0, DEFAULT_PAGE_SIZE))))
                         .thenAccept(entities ->
                                 us.accept(us.get().withList(new ListView.ListViewState<>(entities,
                                         new HashSet<>())))).join();

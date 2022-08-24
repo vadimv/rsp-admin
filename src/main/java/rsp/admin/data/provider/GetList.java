@@ -6,5 +6,5 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public interface GetList<K, T> {
-    CompletableFuture<List<KeyedEntity<K, T>>> getList(int offset, int limit);
+    CompletableFuture<List<KeyedEntity<K, T>>> getList(GetListQuery<K> query);
 }
