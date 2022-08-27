@@ -19,7 +19,11 @@
             <artifactId>rsp</artifactId>
             <version>0.8-SNAPSHOT</version>
         </dependency>
-
+        <dependency>
+            <groupId>com.jsoniter</groupId>
+            <artifactId>jsoniter</artifactId>
+            <version>0.9.19</version>
+        </dependency>
     </dependencies>
 
     <properties>
