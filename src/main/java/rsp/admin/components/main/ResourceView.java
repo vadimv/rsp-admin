@@ -55,8 +55,8 @@ public class ResourceView<T> implements Component<ResourceView.State<T>> {
     public CompletableFuture<State<T>> initialListStateWithEdit(String key) {
             return entityService.getList(GetListQuery.empty(String.class).withPagination(new Pagination(0, DEFAULT_PAGE_SIZE)))
                 .thenApply(entities -> new ListView.ListViewState<>(entities, new HashSet<>()))
-                .thenCombine(entityService.getOne(key).thenApply(keo -> new DetailsViewState<>(keo.map(ke -> ke.data),
-                                                                                               keo.map(ke -> ke.key))),
+                .thenCombine(entityService.getOne(key).thenApply(ke -> new DetailsViewState<>(Optional.of(ke.data),
+                                                                                               Optional.of(ke.key))),
                         (gridState, edit) ->  new State<>(name, title, gridState, Optional.of(edit)));
     }
 
@@ -80,8 +80,8 @@ public class ResourceView<T> implements Component<ResourceView.State<T>> {
                                 }))),
                     listComponent.render(us.get().list,
                                          gridState -> gridState.editRowKey.ifPresentOrElse(
-                                                 editKey -> entityService.getOne(editKey).thenAccept(keo ->
-                                                         us.accept(us.get().withEditData(keo.get()))).join(),
+                                                 editKey -> entityService.getOne(editKey).thenAccept(ke ->
+                                                         us.accept(us.get().withEditData(ke))).join(),
                                                                                      () -> us.accept(us.get().withList(gridState)))),
 
                 when(us.get().details.isPresent() && !us.get().details.get().currentKey.isPresent(),

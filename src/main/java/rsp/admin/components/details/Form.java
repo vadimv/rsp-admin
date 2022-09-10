@@ -5,21 +5,19 @@ import rsp.admin.components.text.TextInput;
 import rsp.html.DocumentPartDefinition;
 import rsp.state.UseState;
 import rsp.util.data.Tuple2;
-import rsp.util.json.JsonDataType;
 
 import java.util.*;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static rsp.html.HtmlDsl.*;
 
 public final class Form implements Component<Form.State> {
 
-    private final Consumer<Function<String, Optional<String>>> submittedData;
+    private final Consumer<Map<String, String>> submittedData;
     private final List<TextInput> fieldsComponents;
 
-    public Form(Consumer<Function<String, Optional<String>>> submittedData, TextInput... fieldsComponents) {
+    public Form(Consumer<Map<String, String>> submittedData, TextInput... fieldsComponents) {
         this.submittedData = submittedData;
         this.fieldsComponents = Arrays.asList(fieldsComponents);
     }
@@ -42,11 +40,11 @@ public final class Form implements Component<Form.State> {
                             if (topValidationErrors.size() > 0) {
                                 useState.accept(new Form.State(topValidationErrors));
                             } else {
-                                submittedData.accept(name -> c.eventObject().value(name).map(v -> {
-                                    assert v instanceof JsonDataType.String;
-                                    final var o = (JsonDataType.String) v;
-                                    return o.value();
-                                }));
+                                final Map<String, String> submission = new HashMap<>();
+                                for(String key : c.eventObject().keys()) {
+                                    submission.put(key, c.eventObject().value(key).map(v -> v.toString()).orElse(""));
+                                }
+                                submittedData.accept(submission);
                             }
                         }),
                         of(fieldsComponents.stream().map(component ->
@@ -65,10 +63,6 @@ public final class Form implements Component<Form.State> {
             this.validationErrors = validationErrors;
         }
 
-
-    /*    public State() {
-            validationErrors = Collections.EMPTY_MAP;
-        }*/
 
     }
 }

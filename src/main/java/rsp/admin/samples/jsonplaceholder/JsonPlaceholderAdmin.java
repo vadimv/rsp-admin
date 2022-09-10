@@ -1,4 +1,4 @@
-package rsp.admin.samples.authorsbooks;
+package rsp.admin.samples.jsonplaceholder;
 
 import rsp.admin.Admin;
 import rsp.admin.components.details.CreateView;
@@ -12,50 +12,40 @@ import rsp.admin.components.main.ResourceView;
 import rsp.admin.components.text.RequiredValidation;
 import rsp.admin.components.text.TextInput;
 import rsp.admin.data.provider.EntityService;
+import rsp.admin.samples.authorsbooks.SimpleDb;
 import rsp.jetty.JettyServer;
 import rsp.server.StaticResources;
 
 import java.io.File;
 
 
-public class AdminSample {
-
+public class JsonPlaceholderAdmin {
+    public static final String JSON_PLACEHOLDER_BASE_URL="http://localhost:3000/";
     public static final int DEFAULT_PORT = 8080;
 
     public static void main(String[] args) {
         final SimpleDb db = new SimpleDb();
-        final EntityService<String, Author> authorsService = db.authorsService();
-        final EntityService<String, Book> booksService = db.booksService();
+        final EntityService<String, User> userService = new UsersService();
 
-        AuthorsBooksServiceStubInit.init(authorsService, booksService);
-
-        final Admin admin = new Admin("Authors and Books",
-                                        new ResourceView<>("authors",
-                                                        "Authors",
-                                                        authorsService,
+        final Admin admin = new Admin("JsonPlaceholder",
+                                        new ResourceView<>("users",
+                                                        "Users",
+                                                        userService,
                                                         new ListView<>(new Column<>("Name", e -> new TextField<>(e.name)),
                                                                             new Column<>(e -> new EditButton())),
-                                                        new EditView<>(d -> new Form(m -> d.accept(Author.of(m.get("name"))),
+                                                        new EditView<>(d -> new Form(m -> d.accept(new User(m.get("name"))),
                                                                                     new TextInput("name",
                                                                                                    TextInput.Type.TEXT,
                                                                                                    "Name",
-                                                                                                   d.get().name.toString(),
+                                                                                                   d.get().toString(),
                                                                                                    new RequiredValidation()))),
-                                                        new CreateView<>(d -> new Form(m -> d.accept(Author.of(m.get("name"))),
+                                                        new CreateView<>(d -> new Form((m -> d.accept(new User(m.get("name")))),
                                                                                         new TextInput("name",
                                                                                                       TextInput.Type.TEXT,
                                                                                                       "Name",
                                                                                                       "",
                                                                                                       new RequiredValidation())))));
 
-                /*
-                                      new Resource<Book>("books",
-                                                     booksService,
-                                                     new Grid<>(new TextField("title"),
-                                                                new EditButton()),
-                                                     new EditForm<>(new TextInput<>("title", s -> s)),
-                                                     new EditForm<String, Book>(new InitialValue<>(new TextInput<>("title", s -> s), "")))));
-*/
         final var s = new JettyServer<>(DEFAULT_PORT,
                                        "/",
                                         admin.app(),

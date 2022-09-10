@@ -8,9 +8,14 @@ import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
 
-public class JsonPlaceholderHttp {
-    private static final String BASE_URL="https://jsonplaceholder.typicode.com/";
+public class RestfulApi {
     private static final Duration REQUEST_TIMEOUT = Duration.ofSeconds(5);
+
+    private final String baseUrl;
+
+    public RestfulApi(String baseUrl) {
+        this.baseUrl = baseUrl;
+    }
 
     public CompletableFuture<String> get(String path) {
             final HttpRequest request = HttpRequest.newBuilder(uri(path)).GET()
@@ -31,6 +36,16 @@ public class JsonPlaceholderHttp {
                          .thenApply(HttpResponse::body);
     }
 
+    public CompletableFuture<String> put(String path, String body) {
+        final HttpRequest request = HttpRequest.newBuilder(uri(path))
+                .PUT(HttpRequest.BodyPublishers.ofString(body))
+                .timeout(REQUEST_TIMEOUT)
+                .build();
+        return HttpClient.newHttpClient()
+                .sendAsync(request, HttpResponse.BodyHandlers.ofString())
+                .thenApply(HttpResponse::body);
+    }
+
     public CompletableFuture<String> delete(String path) {
         final HttpRequest request = HttpRequest.newBuilder(uri(path))
                                                .DELETE()
@@ -41,9 +56,9 @@ public class JsonPlaceholderHttp {
                          .thenApply(HttpResponse::body);
     }
 
-    private static URI uri(String path) {
+    private URI uri(String path) {
         try {
-            return new URI(BASE_URL + path);
+            return new URI(baseUrl + path);
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }

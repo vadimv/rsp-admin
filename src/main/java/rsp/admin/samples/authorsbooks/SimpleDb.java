@@ -27,9 +27,9 @@ public class SimpleDb {
 
     private class SimpleAuthorsEntityService implements EntityService<String, Author> {
         @Override
-        public CompletableFuture<Optional<KeyedEntity<String, Author>>> getOne(String key) {
+        public CompletableFuture<KeyedEntity<String, Author>> getOne(String key) {
             final Author a = authors.get(key);
-            return CompletableFuture.completedFuture(a == null ? Optional.empty() : Optional.of(new KeyedEntity<>(key, a)));
+            return CompletableFuture.completedFuture(new KeyedEntity<>(key, a));
         }
 
         @Override
@@ -39,37 +39,35 @@ public class SimpleDb {
         }
 
         @Override
-        public CompletableFuture<Optional<KeyedEntity<String, Author>>> create(Author entity) {
+        public CompletableFuture<KeyedEntity<String, Author>> create(Author entity) {
             final String key = Long.toString(authorsIdGenerator.incrementAndGet());
             var ke = new KeyedEntity<>(key, entity);
             for (var book : entity.books) {
-                booksService().getOne(book.key).thenAccept(bo -> {
-                    bo.ifPresent(bke -> { bke.update(bke.data.addAuthor(ke));});
-                });
+                booksService().getOne(book.key).thenAccept(bke -> bke.update(bke.data.addAuthor(ke)));
             }
 
             authors.put(key, entity);
-            return CompletableFuture.completedFuture(Optional.of(ke));
+            return CompletableFuture.completedFuture(ke);
         }
 
         @Override
-        public CompletableFuture<Optional<KeyedEntity<String, Author>>> delete(String key) {
+        public CompletableFuture<KeyedEntity<String, Author>> delete(String key) {
             final Author a = authors.remove(key);
             if (a == null) {
-                return CompletableFuture.completedFuture(Optional.empty());
+                return CompletableFuture.failedFuture( new RuntimeException());
             } else {
-                return CompletableFuture.completedFuture(Optional.of(new KeyedEntity<>(key,a)));
+                return CompletableFuture.completedFuture(new KeyedEntity<>(key,a));
             }
         }
 
         @Override
-        public CompletableFuture<Optional<KeyedEntity<String, Author>>> update(KeyedEntity<String, Author> updatedKeyedEntity) {
+        public CompletableFuture<KeyedEntity<String, Author>> update(KeyedEntity<String, Author> updatedKeyedEntity) {
             final Author a = authors.get(updatedKeyedEntity.key);
             if (a == null) {
-                return CompletableFuture.completedFuture(Optional.empty());
+                return CompletableFuture.failedFuture(new RuntimeException("Not found"));
             } else {
                 authors.put(updatedKeyedEntity.key, updatedKeyedEntity.data);
-                return CompletableFuture.completedFuture(Optional.of(updatedKeyedEntity));
+                return CompletableFuture.completedFuture(updatedKeyedEntity);
             }
         }
 
@@ -78,9 +76,9 @@ public class SimpleDb {
 
     public class SimpleBooksEntityService implements EntityService<String, Book> {
         @Override
-        public CompletableFuture<Optional<KeyedEntity<String, Book>>> getOne(String key) {
+        public CompletableFuture<KeyedEntity<String, Book>> getOne(String key) {
             final Book a = books.get(key);
-            return CompletableFuture.completedFuture(a == null ? Optional.empty() : Optional.of(new KeyedEntity<>(key, a)));
+            return CompletableFuture.completedFuture(new KeyedEntity<>(key, a));
         }
 
         @Override
@@ -90,37 +88,36 @@ public class SimpleDb {
         }
 
         @Override
-        public CompletableFuture<Optional<KeyedEntity<String, Book>>> create(Book entity) {
+        public CompletableFuture<KeyedEntity<String, Book>> create(Book entity) {
             String key = Long.toString(booksIdGenerator.incrementAndGet());
             var ke = new KeyedEntity<>(key, entity);
             for (var author : entity.authors) {
-                authorsService().getOne(author.key).thenAccept(bo -> {
-                    bo.ifPresent(bke -> { authorsService().update(bke.update(bke.data.addBook(ke)));});
-                });
+                authorsService().getOne(author.key).thenAccept(bke -> authorsService().update(bke.update(bke.data.addBook(ke))));
+
             }
 
             books.put(key, entity);
-            return CompletableFuture.completedFuture(Optional.of(ke));
+            return CompletableFuture.completedFuture(ke);
         }
 
         @Override
-        public CompletableFuture<Optional<KeyedEntity<String, Book>>> delete(String key) {
+        public CompletableFuture<KeyedEntity<String, Book>> delete(String key) {
             final Book a = books.remove(key);
             if (a == null) {
-                return CompletableFuture.completedFuture(Optional.empty());
+                return CompletableFuture.failedFuture(new RuntimeException("Not found"));
             } else {
-                return CompletableFuture.completedFuture(Optional.of(new KeyedEntity<>(key,a)));
+                return CompletableFuture.completedFuture(new KeyedEntity<>(key,a));
             }
         }
 
         @Override
-        public CompletableFuture<Optional<KeyedEntity<String, Book>>> update(KeyedEntity<String, Book> updatedKeyedEntity) {
+        public CompletableFuture<KeyedEntity<String, Book>> update(KeyedEntity<String, Book> updatedKeyedEntity) {
             final Book a = books.get(updatedKeyedEntity.key);
             if (a == null) {
-                return CompletableFuture.completedFuture(Optional.empty());
+                return CompletableFuture.failedFuture(new RuntimeException("Not found"));
             } else {
                 books.put(updatedKeyedEntity.key, updatedKeyedEntity.data);
-                return CompletableFuture.completedFuture(Optional.of(updatedKeyedEntity));
+                return CompletableFuture.completedFuture(updatedKeyedEntity);
             }
         }
     }

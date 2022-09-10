@@ -34,7 +34,7 @@ public class AuthorsBooksServiceStubInit {
                                                                            .collect(Collectors.toList());
 
         StreamUtils.sequence(createdAuthors).thenAccept(authorsList -> {
-            final List<Long> authorsIds = authorsList.stream().map(a -> Long.valueOf(a.get().key)).collect(Collectors.toList());
+            final List<Long> authorsIds = authorsList.stream().map(a -> Long.valueOf(a.key)).collect(Collectors.toList());
 
             //The infinite stream of authors ids with either 1 or AUTHORS_GROUP_SIZE authors of for a book
             final Stream<List<Long>> groupedAuthorsIds = Stream.iterate(new Tuple2<>(0, List.<Long>of()),
@@ -49,7 +49,7 @@ public class AuthorsBooksServiceStubInit {
             StreamUtils.zip(booksTitles, groupedAuthorsIds, (title, ids) -> new Tuple2<>(title, ids)).forEach(i -> {
                 StreamUtils.sequence(i._2.stream().map(aId -> authorsService.getOne(aId.toString())).collect(Collectors.toList()))
                         .thenAccept(a -> {
-                            final Set<KeyedEntity<String,Author>> bookAuthors = a.stream().filter(opt -> opt.isPresent()).map(opt -> opt.get()).collect(Collectors.toSet());
+                            final Set<KeyedEntity<String,Author>> bookAuthors = a.stream().collect(Collectors.toSet());
                             final var book = new Book(i._1, "desc", bookAuthors);
                             booksService.create(book);
 

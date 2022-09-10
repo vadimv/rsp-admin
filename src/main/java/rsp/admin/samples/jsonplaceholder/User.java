@@ -9,4 +9,11 @@ public class User {
     public String phone;
     public String website;
     public Company company;
+
+    public User() {
+    }
+
+    public User(String name) {
+        this.name = name;
+    }
 }
